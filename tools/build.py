@@ -17,6 +17,23 @@ AUTHOR = {"@type": "Person", "name": "Edward Shih", "sameAs": [LI, "https://gith
 NOTE = f"<!-- School Drone - MIT License - Copyright (c) 2026 Edward Shih ({LI}) and Aaron Shih -->"
 e = html.escape
 
+# ------------------------------------------------ add to home screen (no service worker on purpose)
+ICONS = [("icons/icon-192.png", "192x192", "any"), ("icons/icon-512.png", "512x512", "any"),
+         ("icons/icon-maskable-512.png", "512x512", "maskable")]
+APPLE_ICON = "icons/apple-touch-icon.png"
+
+def check_icons():
+    for rel in [i[0] for i in ICONS] + [APPLE_ICON]:
+        assert (ROOT / rel).is_file(), "missing icon file " + rel
+
+def write_manifest():
+    m = {"name": "School Drone", "short_name": "School Drone",
+         "description": "A free kids game. Fly a school drone in a library and let the robot teacher explain how drones fly.",
+         "start_url": "./", "scope": "./", "display": "standalone", "orientation": "any",
+         "background_color": "#eaf4f1", "theme_color": "#ff8a1f", "lang": "en",
+         "icons": [{"src": src, "sizes": sz, "type": "image/png", "purpose": pu} for src, sz, pu in ICONS]}
+    (ROOT / "manifest.webmanifest").write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
 def ld(obj):
     return '<script type="application/ld+json">\n' + json.dumps(obj, ensure_ascii=False).replace("</", "<\\/") + "\n</script>"
 
@@ -194,6 +211,12 @@ def build_game(lang):
 <link rel="alternate" hreflang="x-default" href="{U}">
 <link rel="license" href="{REPO}/blob/main/LICENSE">
 <link rel="icon" href="{'../' if zh else ''}icon.svg" type="image/svg+xml">
+<link rel="manifest" href="{'../' if zh else ''}manifest.webmanifest">
+<link rel="apple-touch-icon" href="{'../' if zh else ''}{APPLE_ICON}">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="{'學校無人機' if zh else 'School Drone'}">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="School Drone">
 <meta property="og:title" content="{e(g['title'])}">
@@ -325,7 +348,8 @@ PAGES = {
    qa=[("What is School Drone?", "School Drone is a free web game where kids fly a drone inside a library. A robot teacher inside the drone explains each move in simple words."),
        ("Is School Drone free?", "Yes, School Drone is free. There are no ads, no sign-in and nothing to buy."),
        ("Do I need to install anything?", "No. School Drone runs in a web browser. Open the page and press Up."),
-       ("Does it work on a phone or tablet?", "Yes. The buttons are big enough to tap, and you can also tap the library picture to send the drone there."),
+       ("Does it work on a phone or tablet?", "Yes. It works on phones and tablets, held upright or sideways. The buttons are big enough to tap, and you can also tap the library picture to send the drone there."),
+       ("How do I put School Drone on my phone's home screen?", "Open School Drone in your phone's browser and add it to the home screen. On an iPhone or iPad, use Safari: tap the Share button, then tap <b>Add to Home Screen</b>. On Android, use Chrome: tap the menu (three dots), then tap <b>Add to Home screen</b> or <b>Install app</b>. After that, School Drone opens full screen from its own icon."),
        ("What do kids learn?", "Kids learn how a drone goes up, down, left and right, what hover means, why pilots watch the battery, and how to keep a drone away from people and walls."),
        ("Why does the drone have 3 batteries?", "Three batteries let every kid have a turn. One battery flies while the other two charge, so there is always a fresh one ready."),
        ("Why did the drone land by itself?", "The drone lands by itself when its battery is empty. A fresh battery goes in and the next kid becomes the pilot."),
@@ -343,7 +367,8 @@ PAGES = {
    qa=[("學校無人機是什麼？", "學校無人機是一個免費的網頁遊戲，小朋友可以在圖書館裡飛無人機。無人機裡的機器人老師會用簡單的話說明每一個動作。"),
        ("學校無人機是免費的嗎？", "是的，學校無人機是免費的。沒有廣告，不用登入，也不用買任何東西。"),
        ("需要安裝什麼嗎？", "不用。學校無人機直接在瀏覽器裡玩，打開網頁、按「上」就可以了。"),
-       ("手機或平板可以玩嗎？", "可以。按鈕夠大，用手指就能按，也可以直接點圖書館畫面，叫無人機飛過去。"),
+       ("手機或平板可以玩嗎？", "可以。手機和平板直著拿或橫著拿都可以玩。按鈕夠大，用手指就能按，也可以直接點圖書館畫面，叫無人機飛過去。"),
+       ("要怎麼把學校無人機放到手機的主畫面？", "用手機的瀏覽器打開學校無人機，再加入主畫面就可以了。iPhone 或 iPad 請用 Safari：點「分享」按鈕，再點「<b>加入主畫面</b>」。Android 請用 Chrome：點選單（三個點），再點「<b>加到主畫面</b>」或「<b>安裝應用程式</b>」。加好以後，點主畫面上的圖示，學校無人機就會全螢幕打開。"),
        ("小朋友可以學到什麼？", "小朋友可以學到無人機怎麼上、下、左、右，什麼是懸停，為什麼飛行員要看電池，還有無人機要離人和牆壁遠一點。"),
        ("為什麼無人機有 3 顆電池？", "有 3 顆電池，每個小朋友都可以輪到。一顆在飛，另外兩顆在充電，所以隨時都有充飽的電池可以換。"),
        ("為什麼無人機會自己降落？", "電池沒電的時候，無人機會自己降落。換上新的電池以後，下一位小朋友就變成小飛行員。"),
@@ -405,6 +430,8 @@ def page(slug, lang):
 <link rel="alternate" hreflang="zh-Hant-TW" href="{alt['zh']}">
 <link rel="alternate" hreflang="x-default" href="{alt['en']}">
 <link rel="icon" href="{up}icon.svg" type="image/svg+xml">
+<link rel="manifest" href="{up}manifest.webmanifest">
+<link rel="apple-touch-icon" href="{up}{APPLE_ICON}">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="School Drone">
 <meta property="og:title" content="{e(P['title'])}">
@@ -433,6 +460,8 @@ def page(slug, lang):
 """
 
 def build():
+    check_icons()
+    write_manifest()
     build_game("en")
     build_game("zh")
     (ROOT / "zh").mkdir(exist_ok=True)
