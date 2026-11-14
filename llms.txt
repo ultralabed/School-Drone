@@ -1,0 +1,18 @@
+# School Drone (學校無人機)
+
+> A free browser game for kids, in English and Traditional Chinese. Kids fly a school drone inside a library. A robot teacher inside the drone explains each move in simple words.
+
+- Play: https://ultralabed.github.io/School-Drone/
+- Source code: https://github.com/ultralabed/School-Drone
+- Author: Edward Shih (https://www.linkedin.com/in/edward-shih-43942786)
+- License: MIT
+
+## What kids learn
+
+- Faster propellers push more air down, and the drone goes up.
+- The drone leans to move left or right.
+- Hover means staying still in the air.
+- A good pilot lands before the battery is empty. Three batteries let kids take turns.
+- Keep drones away from people, walls and bookshelves.
+- Quadcopters, hexacopters, helicopters and jets fly in different ways.
+- Bees dance in a figure 8 to show where flowers are.
