@@ -34,6 +34,10 @@ the drone is doing. The drone has 3 batteries, so every kid gets a turn.
 
 Open `index.html` in a web browser. There is nothing to install.
 
+The game lives in `src/game.html`. After you edit it, run `python3 tools/build.py` to rebuild the pages.
+
+Guides: [How to play](how-to-play.html), [Rules](rules.html), [Questions and answers](faq.html).
+
 ## License and credit
 
 Idea by Aaron Shih. Built by his dad, [Edward Shih](https://www.linkedin.com/in/edward-shih-43942786).

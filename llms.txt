@@ -3,6 +3,7 @@
 > A free browser game for kids, in English and Traditional Chinese. Kids fly a school drone inside a library. A robot teacher inside the drone explains each move in simple words.
 
 - Play: https://ultralabed.github.io/School-Drone/
+- Play in Traditional Chinese (繁體中文): https://ultralabed.github.io/School-Drone/zh/
 - Source code: https://github.com/ultralabed/School-Drone
 - Idea: Aaron Shih
 - Built by: Edward Shih (https://www.linkedin.com/in/edward-shih-43942786)
