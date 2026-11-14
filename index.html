@@ -7,7 +7,8 @@
 <meta name="description" content="A free browser game for kids. Fly a school drone in a library and let the robot teacher explain how drones go up, down, left, right and hover.">
 <meta name="author" content="Edward Shih and Aaron Shih">
 <meta name="robots" content="index, follow, max-image-preview:large">
-<meta name="theme-color" content="#ff8a1f">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#eaf4f1">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13202b">
 <link rel="canonical" href="https://ultralabed.github.io/School-Drone/">
 <link rel="alternate" hreflang="en" href="https://ultralabed.github.io/School-Drone/">
 <link rel="alternate" hreflang="zh-Hant-TW" href="https://ultralabed.github.io/School-Drone/zh/">
@@ -61,7 +62,7 @@
   --bg:#13202b; --panel:#1c2c3a; --ink:#eaf2f6; --muted:#a2b5c3; --line:#31475a;
   --key:#2a3e50; --key-d:#0f1a24; --track:#2a3c4c; color-scheme:dark }
 
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.4;
+body{touch-action:manipulation;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.4;
   padding-block:16px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}
@@ -136,10 +137,13 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
 @media (max-width:420px){.teacher p{font-size:15px}}
 
 /* Phones. Portrait: scene edge to edge, then batteries, teacher, fly controls (order below), then the rest.
-   .row and .side melt away (display:contents) so every card can be ordered on its own. */
-@supports (height:100dvh){:root{--vh:100dvh}}
+   .row and .side melt away (display:contents) so every card can be ordered on its own.
+   --vh is the SMALL viewport height (browser toolbars showing), so nothing resizes when toolbars hide or show.
+   On short screens the scene shrinks (--sh) so that all seven buttons stay on screen; buttons never go below 48px. */
+@supports (height:100svh){:root{--vh:100svh}}
 @media (max-width:520px) and (orientation:portrait){
-  :root{--k:clamp(52px,min(calc((var(--vh) - 62.5vw - 243px)/3),calc((100vw - 176px)/3)),76px)}
+  :root{--c:256px;--k:clamp(48px,min(calc((var(--vh) - 62.5vw - var(--c))/3),calc((100vw - 176px)/3)),76px);
+    --sh:min(62.5vw,calc(var(--vh) - var(--c) - 3 * var(--k)))}
   body{margin:0;padding-top:max(6px,env(safe-area-inset-top,0px));padding-bottom:max(10px,env(safe-area-inset-bottom,0px))}
   .wrap{gap:6px}
   .row,.side{display:contents}
@@ -150,6 +154,7 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
   .stats{grid-area:s;font-size:12px;line-height:1.25}
   .scene{order:1;border:0;border-radius:0;border-bottom:2px solid var(--ink);
     margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)))}
+  canvas#scene{width:min(100%,calc(var(--sh) * 1.6));margin:0 auto}
   .side>.card{flex:none}
   .batcard{order:2;padding:5px 10px 4px;border-radius:12px}
   .teacher{order:3}
@@ -178,30 +183,49 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
   .pad .key.h{box-shadow:0 4px 0 var(--blue-d)}
   .pad svg{width:20px;height:20px}
   .tricks{flex:1 1 90px;min-width:0;align-self:stretch;display:grid;grid-template-rows:1fr 1fr;gap:10px}
-  .tricks .key{padding:4px;font-size:15px;flex-direction:column;gap:0;min-height:52px;line-height:1.05;text-align:center;box-shadow:0 4px 0 var(--key-d)}
+  .tricks .key{padding:4px;font-size:15px;flex-direction:column;gap:0;min-height:48px;line-height:1.05;text-align:center;box-shadow:0 4px 0 var(--key-d)}
   .tricks .key.eight{box-shadow:0 4px 0 var(--orange-d)}
   .key.eight b{font-size:24px}
   .hint{margin:0}
 }
+/* short portrait screens (real visible height with toolbars): tighter gaps, padding and text */
+@media (max-width:520px) and (orientation:portrait) and (max-height:660px){
+  :root{--c:208px}
+  body{padding-top:max(4px,env(safe-area-inset-top,0px));padding-bottom:max(6px,env(safe-area-inset-bottom,0px))}
+  .wrap{gap:4px}
+  h1{font-size:20px;line-height:1.05}
+  .langb{font-size:12px;padding:1px 12px;line-height:1.25}
+  .stats{font-size:11.5px;line-height:1.2}
+  .batcard{padding:4px 10px 3px}
+  .teacher{padding:3px 10px 4px}
+  .teacher .voice{padding:0;min-height:20px;line-height:1.2}
+  .teacher #say{font-size:13px;line-height:1.22;min-height:3.66em}
+  .fly{padding:5px 8px;gap:4px 10px}
+  .pad{gap:4px}
+  .tricks{gap:8px}
+}
 @media (max-width:520px) and (orientation:portrait) and (hover:none) and (pointer:coarse){.hint{display:none}}
 
-/* Phone landscape: two columns that fill the screen height. Left: scene sized by height + a 2-line teacher strip.
-   Right: title and stats, battery strip, d-pad, trick buttons. Styles, guides and about scroll below. */
-@media (orientation:landscape) and (max-height:520px){
-  :root{--k:clamp(48px,calc((var(--vh) - 140px)/4),64px);--rw:max(180px,calc(3 * var(--k) + 12px));--th:46px}
+/* Touch screens in landscape (phones and tablets): two columns that fill the screen height. Left: scene sized by height + a 3-line
+   teacher strip. Right: title and stats, battery strip, d-pad, trick buttons. Styles, guides and about scroll below.
+   Everything scales with the small viewport height (--vh): --k button size 48..84px, --f teacher text 12..20px.
+   Mouse windows (short desktop windows, near-square iframe panels) keep the normal scrolling layout. */
+@media (orientation:landscape) and (pointer:coarse) and (min-aspect-ratio:4/3) and (max-height:900px){
+  :root{--k:clamp(48px,calc((var(--vh) - 132px)/3.9),84px);--rw:max(180px,calc(3 * var(--k) + 12px));
+    --f:clamp(12px,calc(var(--vh) * .032),20px);--th:calc(var(--f) * 3.75 + 14px)}
   body{margin:0;padding:max(6px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
   .wrap{max-width:none;margin:0;display:grid;gap:6px 10px;
     grid-template-columns:min(calc((var(--vh) - var(--th) - 28px) * 1.6),calc(100% - var(--rw) - 10px)) minmax(0,1fr);
     grid-template-rows:auto auto 1fr auto auto auto auto;
     grid-template-areas:"scene head" "scene bats" "scene fly" "teach fly" "styles styles" "guides guides" "about about"}
   .row,.side{display:contents}
-  header{grid-area:head;justify-self:center;width:100%;max-width:300px;display:grid;grid-template-columns:1fr auto;grid-template-areas:"t l" "s s";align-items:center;gap:0 8px}
+  header{grid-area:head;justify-self:center;width:100%;max-width:calc(var(--rw) + 40px);display:grid;grid-template-columns:1fr auto;grid-template-areas:"t l" "s s";align-items:center;gap:0 8px}
   .top{display:contents}
-  h1{grid-area:t;font-size:19px}
-  .langb{grid-area:l;font-size:12px;padding:1px 10px}
-  .stats{grid-area:s;font-size:11px;line-height:1.25;white-space:nowrap}
+  h1{grid-area:t;font-size:clamp(19px,calc(var(--vh) * .045),30px)}
+  .langb{grid-area:l;font-size:clamp(12px,calc(var(--vh) * .025),16px);padding:1px 10px}
+  .stats{grid-area:s;font-size:clamp(11px,calc(var(--vh) * .026),15px);line-height:1.25;white-space:nowrap}
   .scene{grid-area:scene;align-self:start;border-width:2px;border-radius:12px}
-  .batcard{grid-area:bats;justify-self:center;width:100%;max-width:300px;padding:4px 6px 3px;border-radius:10px}
+  .batcard{grid-area:bats;justify-self:center;width:100%;max-width:calc(var(--rw) + 40px);padding:4px 6px 3px;border-radius:10px}
   .teacher{grid-area:teach;align-self:start}
   .fly{grid-area:fly;justify-self:center;align-self:start;background:none;border:0;padding:0;border-radius:0;flex-direction:column;flex-wrap:nowrap;gap:6px}
   .stylecard{grid-area:styles;margin-top:8px}
@@ -209,28 +233,42 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
   .about{grid-area:about}
   .batcard h2,.teacher small{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   .bats{gap:6px}
-  .cell{height:12px;border-width:2px;border-radius:4px;margin-right:6px}
-  .cell::after{top:2px;height:4px;width:4px;right:-7px}
+  .cell{height:clamp(12px,calc(var(--vh) * .03),20px);border-width:2px;border-radius:4px;margin-right:6px}
+  .cell::after{top:2px;height:calc(100% - 8px);width:4px;right:-7px}
   .cell i{inset:1px auto 1px 1px;border-radius:2px}
-  .bat span{font-size:10px;line-height:1.15;margin-top:2px;overflow:hidden}
+  .bat span{font-size:clamp(10px,calc(var(--vh) * .02),13px);line-height:1.15;margin-top:2px;overflow:hidden}
   .bat span em{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .teacher{display:grid;grid-template-columns:auto 1fr auto;gap:0 8px;align-items:center;height:var(--th);padding:3px 8px;border-radius:10px}
+  .teacher{box-sizing:border-box;display:grid;grid-template-columns:auto 1fr auto;gap:0 8px;align-items:center;height:var(--th);padding:3px 8px;border-radius:10px}
   .teacher p{display:contents}
   .bot{width:24px;height:20px;border-radius:6px}
   .bot::before,.bot::after{top:6px;width:5px;height:5px}
   .bot::before{left:5px}.bot::after{right:5px}
   .bot i{left:8px;right:8px;bottom:4px;height:2px}
-  .teacher #say{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-  .teacher .voice{font-size:11px;line-height:1.1;padding:2px 0;max-width:76px;text-align:center}
+  .teacher #say{font-size:var(--f);line-height:1.25;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+  .teacher .voice{font-size:clamp(11px,calc(var(--f) * .9),16px);line-height:1.1;padding:2px 0;max-width:calc(var(--f) * 6.4);text-align:center}
   .pad{grid-template-columns:repeat(3,var(--k));grid-template-rows:repeat(3,var(--k));gap:6px}
-  .pad .key{font-size:12px;border-radius:12px;box-shadow:0 4px 0 var(--key-d)}
+  .pad .key{font-size:clamp(12px,calc(var(--k) * .2),17px);border-radius:12px;box-shadow:0 4px 0 var(--key-d)}
   .pad .key.h{box-shadow:0 4px 0 var(--blue-d)}
-  .pad svg{width:18px;height:18px}
+  .pad svg{width:clamp(18px,calc(var(--k) * .32),28px);height:clamp(18px,calc(var(--k) * .32),28px)}
   .tricks{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:calc(3 * var(--k) + 12px);min-width:0}
-  .tricks .key{height:calc(var(--k) * .85);min-height:48px;padding:2px;font-size:13px;flex-direction:column;gap:0;line-height:1;text-align:center;box-shadow:0 4px 0 var(--key-d)}
+  .tricks .key{height:calc(var(--k) * .85);min-height:48px;padding:2px;font-size:clamp(13px,calc(var(--k) * .2),17px);flex-direction:column;gap:0;line-height:1;text-align:center;box-shadow:0 4px 0 var(--key-d)}
   .tricks .key.eight{box-shadow:0 4px 0 var(--orange-d)}
-  .key.eight b{font-size:20px}
+  .key.eight b{font-size:clamp(20px,calc(var(--k) * .32),28px)}
   .hint{display:none}
+}
+/* very short landscape phones: squeeze the right column so the d-pad and tricks still fit */
+@media (orientation:landscape) and (pointer:coarse) and (min-aspect-ratio:4/3) and (max-height:330px){
+  body{padding-top:max(4px,env(safe-area-inset-top,0px));padding-bottom:max(4px,env(safe-area-inset-bottom,0px))}
+  .wrap{row-gap:4px}
+  h1{font-size:17px}
+  .langb{padding:0 10px}
+  .stats{font-size:10.5px;line-height:1.15}
+  .batcard{padding:3px 6px 2px}
+  .cell{height:11px}
+  .bat span{font-size:9.5px;line-height:1.1;margin-top:1px}
+  .fly{gap:4px}
+  .pad,.tricks{gap:4px}
+  .tricks{width:calc(3 * var(--k) + 8px)}
 }
 </style>
 </head>
@@ -745,14 +783,19 @@ for(const id in STYLES){const b=document.createElement('button');b.type='button'
   b.addEventListener('click',()=>{D.style=id;for(const k in styleBtns)styleBtns[k].setAttribute('aria-pressed',k===id);lastAct=now;say(t('tip_'+id))});
   styleBtns[id]=b;$('styles').appendChild(b)}
 
-/* hold-to-repeat: every active hold is remembered by pointer id so it can always be stopped (release anywhere, cancel, blur, page hidden) */
+/* hold-to-repeat: every active hold is remembered by pointer id so it can always be stopped (release anywhere, cancel, blur, page hidden).
+   A key can be held by several fingers at once: it keeps repeating until the last one lets go. */
 const holds=new Map();
-const stopHolds=()=>{[...holds.values()].forEach(f=>f());holds.clear()};
+const stopHolds=()=>{[...holds.values()].forEach(f=>f())};
 document.querySelectorAll('[data-cmd]').forEach(b=>{
-  const c=b.dataset.cmd,rep=['up','down','left','right'].includes(c);let iv=0,pid=null;
-  const stop=()=>{clearInterval(iv);iv=0;if(pid!==null){holds.delete(pid);pid=null}};
-  b.addEventListener('pointerdown',e=>{e.preventDefault();cmd(c);if(rep){stop();pid=e.pointerId;iv=setInterval(()=>cmd(c),300);holds.set(pid,stop)}});
-  for(const ev of['pointerup','pointerleave','pointercancel','lostpointercapture'])b.addEventListener(ev,stop);
+  const c=b.dataset.cmd,rep=['up','down','left','right'].includes(c),ids=new Set();let iv=0;
+  const end=id=>{if(!ids.delete(id))return;holds.delete(id);if(!ids.size){clearInterval(iv);iv=0}};
+  b.addEventListener('pointerdown',e=>{e.preventDefault();cmd(c);
+    /* a finger or pen keeps the key even when it slides off it; a mouse stops when it leaves (see pointerleave) */
+    if(e.pointerType!=='mouse'){try{b.setPointerCapture(e.pointerId)}catch(_){}}
+    if(rep){const id=e.pointerId;ids.add(id);holds.set(id,()=>end(id));if(!iv)iv=setInterval(()=>cmd(c),300)}});
+  for(const ev of['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,e=>end(e.pointerId));
+  b.addEventListener('pointerleave',e=>{let cap=false;try{cap=e.pointerType!=='mouse'&&b.hasPointerCapture(e.pointerId)}catch(_){}if(!cap)end(e.pointerId)});
   b.addEventListener('pointerup',()=>b.blur());
   b.addEventListener('click',e=>{if(e.detail===0)cmd(c)});
 });
@@ -772,14 +815,22 @@ addEventListener('keydown',e=>{const c=KEYS[e.key];if(!c||e.metaKey||e.ctrlKey||
 function sendTo(e){const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*W,py=(e.clientY-r.top)/r.height*H;
   if(blocked())return;lastAct=now;lastCmd='tap';D.mode='goto';D.tx=clamp(px,60,740);D.ta=clamp(376-py,30,320);
   say(t('tap'))}
-let tap=null;
+let tap=null,ignoreTouch=false;const fingers=new Set();
 cv.addEventListener('pointerdown',e=>{
   if(e.pointerType==='mouse'){tap=null;sendTo(e);return}
+  fingers.add(e.pointerId);
+  /* a second finger (pinch, two-finger tap) cancels the tap and nothing counts until every finger is up */
+  if(fingers.size>1){ignoreTouch=true;tap=null;return}
   tap={id:e.pointerId,x:e.clientX,y:e.clientY,t:performance.now()}});
 cv.addEventListener('pointerup',e=>{
-  const d=tap;if(!d||e.pointerId!==d.id)return;tap=null;
+  fingers.delete(e.pointerId);
+  const d=tap,ok=d&&!ignoreTouch&&e.pointerId===d.id;
+  if(!fingers.size)ignoreTouch=false;
+  if(!ok)return;tap=null;
   if(performance.now()-d.t<=500&&Math.hypot(e.clientX-d.x,e.clientY-d.y)<12)sendTo(e)});
-for(const ev of['pointercancel','pointerleave'])cv.addEventListener(ev,e=>{if(tap&&e.pointerId===tap.id)tap=null});
+cv.addEventListener('pointercancel',e=>{fingers.delete(e.pointerId);if(!fingers.size)ignoreTouch=false;if(tap&&e.pointerId===tap.id)tap=null});
+cv.addEventListener('pointerleave',e=>{if(tap&&e.pointerId===tap.id)tap=null});
+addEventListener('blur',()=>{fingers.clear();ignoreTouch=false;tap=null});
 
 /* ---------- language ---------- */
 function applyLang(first){

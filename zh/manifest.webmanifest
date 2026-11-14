@@ -1,0 +1,32 @@
+{
+  "name": "學校無人機",
+  "short_name": "學校無人機",
+  "description": "免費的兒童遊戲。在圖書館裡飛一架學校無人機，讓機器人老師說明無人機是怎麼飛的。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eaf4f1",
+  "theme_color": "#ff8a1f",
+  "lang": "zh-Hant-TW",
+  "icons": [
+    {
+      "src": "../icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
