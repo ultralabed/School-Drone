@@ -635,6 +635,7 @@ function applyLang(first){
 }
 $('lang').addEventListener('click',()=>{const nl=lang==='zh'?'en':'zh';try{localStorage.setItem('sd-lang',nl)}catch(e){}
   if(window.SD_PAGE_LANG==='zh'&&nl==='en'){try{location.href='https://ultralabed.github.io/School-Drone/#en';return}catch(e){}}
+  try{history.replaceState(null,'',nl==='en'?'#en':location.pathname+location.search)}catch(e){}
   lang=nl;applyLang(false)});
 applyLang(true);
 
