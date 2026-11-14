@@ -176,13 +176,13 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
   <nav class="guides" aria-label="Guides">
     <a id="g-how" data-i="gHow" href="https://ultralabed.github.io/School-Drone/how-to-play.html" target="_blank" rel="noopener">How to play</a>
     <a id="g-rules" data-i="gRules" href="https://ultralabed.github.io/School-Drone/rules.html" target="_blank" rel="noopener">Rules</a>
-    <a id="g-faq" data-i="gFaq" href="https://ultralabed.github.io/School-Drone/faq.html" target="_blank" rel="noopener">Questions</a>
+    <a id="g-faq" data-i="gFaq" href="https://ultralabed.github.io/School-Drone/faq.html" target="_blank" rel="noopener">Questions and answers</a>
   </nav>
 
   <section class="card about" id="about">
     <div>
       <h2 data-i="learnH">What kids learn</h2>
-      <ul id="learn"></ul>
+      <ul id="learn"><li>Up and down: when the propellers spin faster they push more air down, and the drone goes up.</li><li>Left and right: the drone leans a little, and then it slides that way.</li><li>Hover: the drone can stay still in the air.</li><li>Batteries: a good pilot lands before the battery is empty. With 3 batteries, kids take turns.</li><li>Safety: keep the drone away from people, walls and bookshelves.</li><li>Flying machines: 4 propellers, 6 propellers, a helicopter and a jet all fly in different ways.</li><li>Nature: bees dance in a figure 8 to show friends where the flowers are.</li></ul>
     </div>
     <div>
       <h2 data-i="whoH">Who made this</h2>
@@ -273,7 +273,9 @@ zh:{title:"學校無人機：免費兒童無人機飛行網頁遊戲",desc:"免�
 let lang='en';
 lang=/^zh/i.test(navigator.language||'')?'zh':'en';
 if(window.SD_PAGE_LANG==='zh')lang='zh';
-else try{const sv=localStorage.getItem('sd-lang');if(sv==='zh'||sv==='en')lang=sv}catch(e){}
+else{let h='';try{h=location.hash}catch(e){}
+  if(h==='#en'){lang='en';try{localStorage.setItem('sd-lang','en')}catch(e){}}
+  else try{const sv=localStorage.getItem('sd-lang');if(sv==='zh'||sv==='en')lang=sv}catch(e){}}
 const t=(k,a)=>{const v=L[lang][k]??L.en[k];return typeof v==='function'?v(a):v};
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 
@@ -670,7 +672,7 @@ function applyLang(first){
   if(first){sayEl.textContent=t('hello');pickVoice()}else{buildBg();spStop();pickVoice();say(t('langSay'),true,true)}
 }
 $('lang').addEventListener('click',()=>{const nl=lang==='zh'?'en':'zh';try{localStorage.setItem('sd-lang',nl)}catch(e){}
-  if(window.SD_PAGE_LANG==='zh'&&nl==='en'){try{location.href='https://ultralabed.github.io/School-Drone/';return}catch(e){}}
+  if(window.SD_PAGE_LANG==='zh'&&nl==='en'){try{location.href='https://ultralabed.github.io/School-Drone/#en';return}catch(e){}}
   lang=nl;applyLang(false)});
 applyLang(true);
 

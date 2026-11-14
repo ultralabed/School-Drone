@@ -132,62 +132,62 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
 
 <div class="wrap">
   <header>
-    <h1 id="h1">School <span>Drone</span></h1>
-    <div class="top"><div class="stats"><span data-i="pilot">Pilot:</span> <b id="pilot">Mia</b> &nbsp;·&nbsp; <span data-i="height">Height:</span> <b id="height">0.0 m</b></div>
-    <button class="langb" id="lang" type="button" lang="zh-Hant">中文</button></div>
+    <h1 id="h1">學校<span>無人機</span></h1>
+    <div class="top"><div class="stats"><span data-i="pilot">小飛行員：</span> <b id="pilot">小美</b> &nbsp;·&nbsp; <span data-i="height">高度：</span> <b id="height">0.0 m</b></div>
+    <button class="langb" id="lang" type="button" lang="en">English</button></div>
   </header>
 
-  <div class="scene"><canvas id="scene" aria-label="A library. Kids stand around a rug watching a drone fly. Tap anywhere to send the drone there."></canvas></div>
+  <div class="scene"><canvas id="scene" aria-label="一間圖書館。小朋友圍著地毯看無人機飛。點任何地方，無人機就會飛過去。"></canvas></div>
 
   <div class="teacher" id="teacher">
     <div class="bot" aria-hidden="true"><i></i></div>
-    <p><small data-i="teacherLabel">Robot drone teacher</small><span id="say" aria-live="polite">Hello! I am the robot teacher inside the drone. Press Up to take off.</span></p>
-    <button class="voice" id="voice" type="button">Voice: on</button>
+    <p><small data-i="teacherLabel">機器人無人機老師</small><span id="say" aria-live="polite">哈囉！我是住在無人機裡的機器人老師。按「上」就可以起飛。</span></p>
+    <button class="voice" id="voice" type="button">聲音：開</button>
   </div>
 
   <div class="row">
     <section class="card fly" aria-label="Fly the drone">
       <div class="pad">
-        <button class="key u" id="b-up" type="button" data-cmd="up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 11h-6v7H9v-7H3z" fill="currentColor"/></svg><span data-i="up">Up</span></button>
-        <button class="key l" id="b-left" type="button" data-cmd="left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l11-9v6h7v6h-7v6z" fill="currentColor"/></svg><span data-i="left">Left</span></button>
-        <button class="key h" id="b-hover" type="button" data-cmd="hover"><span data-i="hover">Hover</span></button>
-        <button class="key r" id="b-right" type="button" data-cmd="right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12L10 3v6H3v6h7v6z" fill="currentColor"/></svg><span data-i="right">Right</span></button>
-        <button class="key d" id="b-down" type="button" data-cmd="down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21l9-11h-6V3H9v7H3z" fill="currentColor"/></svg><span data-i="down">Down</span></button>
+        <button class="key u" id="b-up" type="button" data-cmd="up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 11h-6v7H9v-7H3z" fill="currentColor"/></svg><span data-i="up">上</span></button>
+        <button class="key l" id="b-left" type="button" data-cmd="left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l11-9v6h7v6h-7v6z" fill="currentColor"/></svg><span data-i="left">左</span></button>
+        <button class="key h" id="b-hover" type="button" data-cmd="hover"><span data-i="hover">懸停</span></button>
+        <button class="key r" id="b-right" type="button" data-cmd="right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12L10 3v6H3v6h7v6z" fill="currentColor"/></svg><span data-i="right">右</span></button>
+        <button class="key d" id="b-down" type="button" data-cmd="down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21l9-11h-6V3H9v7H3z" fill="currentColor"/></svg><span data-i="down">下</span></button>
       </div>
       <div class="tricks">
-        <button class="key eight" id="b-eight" type="button" data-cmd="eight"><b>8</b> <span data-i="bee">Bee dance</span></button>
-        <button class="key" id="b-land" type="button" data-cmd="land"><span data-i="land">Land</span></button>
+        <button class="key eight" id="b-eight" type="button" data-cmd="eight"><b>8</b> <span data-i="bee">蜜蜂舞</span></button>
+        <button class="key" id="b-land" type="button" data-cmd="land"><span data-i="land">降落</span></button>
       </div>
-      <p class="hint" data-i="hint">Or tap the library to tell the drone where to go. Keyboard: arrows, space, 8, L.</p>
+      <p class="hint" data-i="hint">也可以點圖書館，告訴無人機要飛去哪裡。鍵盤：方向鍵、空白鍵、8、L。</p>
     </section>
 
     <div class="side">
       <section class="card">
-        <h2 data-i="batH">3 batteries, so everyone gets a turn</h2>
+        <h2 data-i="batH">3 顆電池，大家都可以輪流飛</h2>
         <div class="bats" id="bats"></div>
       </section>
       <section class="card">
-        <h2 data-i="pickH">Pick a drone</h2>
+        <h2 data-i="pickH">選一台無人機</h2>
         <div class="styles" id="styles"></div>
       </section>
     </div>
   </div>
 
   <nav class="guides" aria-label="Guides">
-    <a id="g-how" data-i="gHow" href="https://ultralabed.github.io/School-Drone/how-to-play.html" target="_blank" rel="noopener">How to play</a>
-    <a id="g-rules" data-i="gRules" href="https://ultralabed.github.io/School-Drone/rules.html" target="_blank" rel="noopener">Rules</a>
-    <a id="g-faq" data-i="gFaq" href="https://ultralabed.github.io/School-Drone/faq.html" target="_blank" rel="noopener">Questions</a>
+    <a id="g-how" data-i="gHow" href="https://ultralabed.github.io/School-Drone/zh/how-to-play.html" target="_blank" rel="noopener">怎麼玩</a>
+    <a id="g-rules" data-i="gRules" href="https://ultralabed.github.io/School-Drone/zh/rules.html" target="_blank" rel="noopener">規則</a>
+    <a id="g-faq" data-i="gFaq" href="https://ultralabed.github.io/School-Drone/zh/faq.html" target="_blank" rel="noopener">常見問題</a>
   </nav>
 
   <section class="card about" id="about">
     <div>
-      <h2 data-i="learnH">What kids learn</h2>
-      <ul id="learn"></ul>
+      <h2 data-i="learnH">小朋友可以學到什麼</h2>
+      <ul id="learn"><li>上和下：螺旋槳轉得越快，往下推的空氣越多，無人機就會往上飛。</li><li>左和右：無人機的身體斜一點點，就會往那一邊滑過去。</li><li>懸停：無人機可以停在空中不動。</li><li>電池：好的飛行員會在沒電以前降落。有 3 顆電池，大家可以輪流飛。</li><li>安全：無人機要離人、牆壁和書櫃遠一點。</li><li>飛行器：4 個螺旋槳、6 個螺旋槳、直升機和噴射機，飛的方法都不一樣。</li><li>大自然：蜜蜂會跳 8 字舞，告訴朋友花在哪裡。</li></ul>
     </div>
     <div>
-      <h2 data-i="whoH">Who made this</h2>
-      <p><span data-i="who1">School Drone is a kids' project. The idea came from Aaron Shih. It was built by his dad,</span> <a href="https://www.linkedin.com/in/edward-shih-43942786" target="_blank" rel="noopener author">Edward Shih</a><span data-i="who2">.</span></p>
-      <p><span data-i="who3">It is free and open source under the MIT license. You may copy it and change it. Please keep the author's name.</span> <a href="https://github.com/ultralabed/School-Drone" target="_blank" rel="noopener" data-i="code">See the code on GitHub</a></p>
+      <h2 data-i="whoH">這是誰做的</h2>
+      <p><span data-i="who1">學校無人機是一個給小朋友的作品。點子來自 Aaron Shih，由他的爸爸</span> <a href="https://www.linkedin.com/in/edward-shih-43942786" target="_blank" rel="noopener author">Edward Shih</a><span data-i="who2"> 製作。</span></p>
+      <p><span data-i="who3">這個作品免費、開放原始碼，使用 MIT 授權。你可以複製、可以修改，請保留作者的名字。</span> <a href="https://github.com/ultralabed/School-Drone" target="_blank" rel="noopener" data-i="code">到 GitHub 看程式碼</a></p>
     </div>
   </section>
 </div>
@@ -274,7 +274,9 @@ zh:{title:"學校無人機：免費兒童無人機飛行網頁遊戲",desc:"免�
 let lang='en';
 lang=/^zh/i.test(navigator.language||'')?'zh':'en';
 if(window.SD_PAGE_LANG==='zh')lang='zh';
-else try{const sv=localStorage.getItem('sd-lang');if(sv==='zh'||sv==='en')lang=sv}catch(e){}
+else{let h='';try{h=location.hash}catch(e){}
+  if(h==='#en'){lang='en';try{localStorage.setItem('sd-lang','en')}catch(e){}}
+  else try{const sv=localStorage.getItem('sd-lang');if(sv==='zh'||sv==='en')lang=sv}catch(e){}}
 const t=(k,a)=>{const v=L[lang][k]??L.en[k];return typeof v==='function'?v(a):v};
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 
@@ -671,7 +673,7 @@ function applyLang(first){
   if(first){sayEl.textContent=t('hello');pickVoice()}else{buildBg();spStop();pickVoice();say(t('langSay'),true,true)}
 }
 $('lang').addEventListener('click',()=>{const nl=lang==='zh'?'en':'zh';try{localStorage.setItem('sd-lang',nl)}catch(e){}
-  if(window.SD_PAGE_LANG==='zh'&&nl==='en'){try{location.href='https://ultralabed.github.io/School-Drone/';return}catch(e){}}
+  if(window.SD_PAGE_LANG==='zh'&&nl==='en'){try{location.href='https://ultralabed.github.io/School-Drone/#en';return}catch(e){}}
   lang=nl;applyLang(false)});
 applyLang(true);
 

@@ -28,6 +28,109 @@ GAME = {
                desc="免費的兒童網頁遊戲。在圖書館裡飛學校無人機，機器人老師會用簡單的話告訴你無人機怎麼上、下、左、右和懸停。"),
 }
 
+# ------------------------------------------------- pre-render from the L dictionary
+_ESC = {"n": "\n", "t": "\t", "\\": "\\", "'": "'", '"': '"'}
+
+def _read_str(s, i):
+    """s[i] is a quote; return (decoded string, index after the closing quote)."""
+    q = s[i]
+    assert q in "'\"", "string expected at %d" % i
+    i += 1
+    out = []
+    while True:
+        assert i < len(s), "unterminated string"
+        c = s[i]
+        if c == "\\":
+            n = s[i + 1]
+            if n == "u":
+                out.append(chr(int(s[i + 2:i + 6], 16))); i += 6; continue
+            assert n in _ESC, "unknown escape \\" + n
+            out.append(_ESC[n]); i += 2; continue
+        if c == q:
+            return "".join(out), i + 1
+        assert c != "\n", "newline inside string"
+        out.append(c); i += 1
+
+def _skip_value(s, i):
+    """Skip an unparsed value (a function) up to the next top-level comma."""
+    depth = 0
+    while i < len(s):
+        c = s[i]
+        if c in "'\"":
+            _, i = _read_str(s, i); continue
+        if c in "([{": depth += 1
+        elif c in ")]}":
+            if depth == 0: return i
+            depth -= 1
+        elif c == "," and depth == 0: return i
+        i += 1
+    raise AssertionError("unterminated value")
+
+def parse_lang_block(src, lng):
+    """Return {key: str | list[str]} for L.<lng> in src/game.html (function entries skipped)."""
+    assert src.count("const L={") == 1, "L dictionary not found"
+    m = re.compile(r"^%s:\{" % lng, re.M).search(src, src.index("const L={"))
+    assert m, "L." + lng + " not found"
+    i, d, ws = m.end(), {}, " \t\r\n,"
+    while True:
+        while src[i] in ws: i += 1
+        if src[i] == "}": break
+        k = re.compile(r"[A-Za-z_]\w*").match(src, i)
+        assert k and src[k.end()] == ":", "bad key at %d: %r" % (i, src[i:i + 30])
+        key, i = k.group(), k.end() + 1
+        if src[i] in "'\"":
+            d[key], i = _read_str(src, i)
+            j = i
+            while src[j] in " \t": j += 1
+            assert src[j] in ",}\n", "unsupported value for %s: %r" % (key, src[j:j + 30])
+        elif src[i] == "[":
+            i += 1; arr = []
+            while True:
+                while src[i] in ws: i += 1
+                if src[i] == "]": i += 1; break
+                v, i = _read_str(src, i); arr.append(v)
+            d[key] = arr
+        else:
+            i = _skip_value(src, i)
+    return d
+
+def prerender(markup, T, lng):
+    """Make the static markup equal to what applyLang(true) produces at runtime."""
+    for k in ("h1", "hello", "other", "voiceOn", "aria", "pilots", "learn"):
+        assert k in T, "missing L key " + k
+    assert isinstance(T["pilots"], list) and len(T["pilots"]) == 6, "pilots parse"
+    assert isinstance(T["learn"], list) and len(T["learn"]) == 7, "learn parse"
+    zh = lng == "zh"
+    def one(pattern, repl, what):
+        nonlocal markup
+        markup, n = re.subn(pattern, repl, markup, flags=re.S)
+        assert n == 1, "%s: expected 1 match, got %d" % (what, n)
+    tx = lambda v: e(v, quote=False)
+    one(r'(<h1 id="h1">).*?(</h1>)', lambda m: m.group(1) + T["h1"] + m.group(2), "h1")
+    one(r'(<span id="say"[^>]*>)[^<]*(</span>)', lambda m: m.group(1) + tx(T["hello"]) + m.group(2), "say")
+    one(r'(<button class="langb" id="lang" type="button" lang=")[^"]*(">)[^<]*(</button>)',
+        lambda m: m.group(1) + ("en" if zh else "zh-Hant") + m.group(2) + tx(T["other"]) + m.group(3), "lang button")
+    one(r'(<button class="voice" id="voice" type="button">)[^<]*(</button>)',
+        lambda m: m.group(1) + tx(T["voiceOn"]) + m.group(2), "voice")
+    one(r'(<canvas id="scene" aria-label=")[^"]*(")', lambda m: m.group(1) + e(T["aria"]) + m.group(2), "aria")
+    one(r'(<b id="pilot">)[^<]*(</b>)', lambda m: m.group(1) + tx(T["pilots"][0]) + m.group(2), "pilot")
+    one(r'(<ul id="learn">)</ul>',
+        lambda m: m.group(1) + "".join("<li>%s</li>" % tx(x) for x in T["learn"]) + "</ul>", "learn")
+    for gid, slug in (("g-how", "how-to-play"), ("g-rules", "rules"), ("g-faq", "faq")):
+        one(r'(<a id="%s"[^>]* href=")[^"]*(")' % gid,
+            lambda m, slug=slug: m.group(1) + U + ("zh/" if zh else "") + slug + ".html" + m.group(2), gid)
+    total = markup.count("data-i=")
+    keys = []
+    def fill(m):
+        k = m.group(3)
+        assert isinstance(T.get(k), str), "missing/non-string L key for data-i=" + k
+        keys.append(k)
+        return m.group(1) + tx(T[k]) + m.group(4)
+    markup = re.sub(r'(<(\w+)\b[^>]*\bdata-i="(\w+)"[^>]*>)[^<]*(</\2>)', fill, markup)
+    assert len(keys) == total and total > 10, "data-i filled %d of %d" % (len(keys), total)
+    return markup
+
+
 def build_game(lang):
     zh = lang == "zh"
     g = GAME[lang]
@@ -52,6 +155,9 @@ def build_game(lang):
     for lng in ("en", "zh"):
         k = body.index(lng + ":{title:")
         assert body.count("title:", k, body.index("h1:", k)) == 1, lng
+    # pre-render the language into the static markup (single source: L in src/game.html)
+    si = body.index("<script>")
+    body = prerender(body[:si], parse_lang_block(src, lang), lang) + body[si:]
     if zh:
         marker = "<script>\n"
         assert body.count(marker) >= 1, "game script not found"

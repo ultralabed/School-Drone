@@ -235,7 +235,9 @@ zh:{title:'學校無人機圖書館',desc:'免費的兒童小遊戲。在圖書�
 let lang='en';
 lang=/^zh/i.test(navigator.language||'')?'zh':'en';
 if(window.SD_PAGE_LANG==='zh')lang='zh';
-else try{const sv=localStorage.getItem('sd-lang');if(sv==='zh'||sv==='en')lang=sv}catch(e){}
+else{let h='';try{h=location.hash}catch(e){}
+  if(h==='#en'){lang='en';try{localStorage.setItem('sd-lang','en')}catch(e){}}
+  else try{const sv=localStorage.getItem('sd-lang');if(sv==='zh'||sv==='en')lang=sv}catch(e){}}
 const t=(k,a)=>{const v=L[lang][k]??L.en[k];return typeof v==='function'?v(a):v};
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 
@@ -632,7 +634,7 @@ function applyLang(first){
   if(first){sayEl.textContent=t('hello');pickVoice()}else{buildBg();spStop();pickVoice();say(t('langSay'),true,true)}
 }
 $('lang').addEventListener('click',()=>{const nl=lang==='zh'?'en':'zh';try{localStorage.setItem('sd-lang',nl)}catch(e){}
-  if(window.SD_PAGE_LANG==='zh'&&nl==='en'){try{location.href='https://ultralabed.github.io/School-Drone/';return}catch(e){}}
+  if(window.SD_PAGE_LANG==='zh'&&nl==='en'){try{location.href='https://ultralabed.github.io/School-Drone/#en';return}catch(e){}}
   lang=nl;applyLang(false)});
 applyLang(true);
 
