@@ -1,0 +1,639 @@
+<title>School Drone Library</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: one big library scene on top, the robot teacher's words under it, then three chunky control groups (fly, batteries, drone style). */
+:root{
+  --bg:#eaf4f1; --panel:#ffffff; --ink:#1b2a3a; --muted:#566878; --line:#cfe0d9;
+  --orange:#ff8a1f; --orange-d:#c9620a; --blue:#2b7fd9; --blue-d:#195ca6;
+  --key:#f4f8fb; --key-d:#b9c9d6;
+  --good:#2fa866; --warn:#e3a008; --bad:#d9483b; --track:#e3ebef;
+  --display:"Baloo 2","PingFang TC","Microsoft JhengHei","Noto Sans TC","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","PingFang TC","Microsoft JhengHei","Noto Sans TC","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#13202b; --panel:#1c2c3a; --ink:#eaf2f6; --muted:#a2b5c3; --line:#31475a;
+  --key:#2a3e50; --key-d:#0f1a24; --track:#2a3c4c; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#13202b; --panel:#1c2c3a; --ink:#eaf2f6; --muted:#a2b5c3; --line:#31475a;
+  --key:#2a3e50; --key-d:#0f1a24; --track:#2a3c4c; color-scheme:dark }
+
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.4;
+  padding-block:16px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,5vw,38px);line-height:1;margin:0}
+h1 span{color:var(--orange)}
+.stats{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink)}
+h2{font-family:var(--display);font-weight:600;font-size:18px;margin:0 0 8px;line-height:1.1}
+
+.scene{border-radius:18px;overflow:hidden;border:4px solid var(--ink);background:#bfe0d2;line-height:0}
+canvas#scene{width:100%;aspect-ratio:8/5;display:block;cursor:pointer;touch-action:manipulation}
+
+.teacher{display:flex;align-items:center;gap:12px;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:10px 14px}
+.bot{flex:none;width:46px;height:38px;border-radius:10px;background:#16324a;position:relative}
+.bot::before,.bot::after{content:"";position:absolute;top:11px;width:8px;height:8px;border-radius:50%;background:#6fe6ff}
+.bot::before{left:10px}.bot::after{right:10px}
+.bot i{position:absolute;left:17px;right:17px;bottom:7px;height:3px;border-radius:2px;background:#6fe6ff}
+.teacher.talk .bot i{animation:mouth .25s infinite alternate}
+@keyframes mouth{to{height:8px;bottom:5px}}
+.teacher p{margin:0;flex:1;min-width:0;font-weight:700;font-size:17px}
+.teacher small{display:block;color:var(--muted);font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+
+.row{display:flex;flex-wrap:wrap;gap:14px;align-items:stretch}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:14px;min-width:0}
+.fly{flex:1 1 300px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}
+.side{flex:1 1 260px;display:flex;flex-direction:column;gap:14px;min-width:0}
+
+button{font-family:var(--display);font-weight:800;color:var(--ink);cursor:pointer;border:0;-webkit-tap-highlight-color:transparent;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.key{background:var(--key);border-radius:14px;box-shadow:0 5px 0 var(--key-d);border:2px solid var(--key-d);font-size:15px;line-height:1.05}
+.key:active,.key.down{transform:translateY(4px);box-shadow:0 1px 0 var(--key-d)}
+.pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(3,64px);gap:8px}
+.pad .key{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.pad svg{width:24px;height:24px}
+.pad .u{grid-area:1/2}.pad .l{grid-area:2/1}.pad .h{grid-area:2/2}.pad .r{grid-area:2/3}.pad .d{grid-area:3/2}
+.key.h{background:var(--blue);border-color:var(--blue-d);box-shadow:0 5px 0 var(--blue-d);color:#fff}
+.key.h:active,.key.h.down{box-shadow:0 1px 0 var(--blue-d)}
+.tricks{display:flex;flex-direction:column;gap:12px;min-width:132px}
+.tricks .key{padding:12px 14px;font-size:17px;display:flex;align-items:center;gap:8px;justify-content:center}
+.key.eight{background:var(--orange);border-color:var(--orange-d);box-shadow:0 5px 0 var(--orange-d);color:#231200}
+.key.eight:active,.key.eight.down{box-shadow:0 1px 0 var(--orange-d)}
+.key.eight b{font-size:26px;line-height:.8}
+.hint{color:var(--muted);font-size:13px;font-weight:700;margin:10px 0 0;text-align:center;flex-basis:100%}
+
+.bats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bat{min-width:0}
+.cell{height:26px;border-radius:7px;border:2px solid var(--ink);background:var(--track);position:relative;margin-right:6px}
+.cell::after{content:"";position:absolute;right:-8px;top:6px;width:5px;height:10px;border-radius:0 3px 3px 0;background:var(--ink)}
+.cell i{position:absolute;inset:2px auto 2px 2px;border-radius:3px;background:var(--good);width:0}
+.bat.low .cell i{background:var(--warn)} .bat.empty .cell i{background:var(--bad)}
+.bat span{display:block;font-weight:800;font-size:13px;margin-top:4px;font-variant-numeric:tabular-nums}
+.bat em{font-style:normal;color:var(--muted);font-weight:700}
+.bat.on span{color:var(--orange)}
+
+.styles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.styles button{background:var(--key);border:2px solid var(--key-d);border-radius:12px;padding:6px 2px 6px;font-size:13px;line-height:1.1;min-width:0}
+.styles button[aria-pressed="true"]{border-color:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+.styles canvas{width:100%;max-width:84px;aspect-ratio:84/52;display:block;margin:0 auto}
+.voice{background:none;color:var(--muted);font-family:var(--body);font-weight:800;font-size:13px;text-decoration:underline;padding:6px 0;flex:none}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.langb{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-size:15px}
+.guides{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px;font-weight:800}
+.guides a{color:var(--blue)}
+.about{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px 28px}
+.about>div{min-width:0}
+.about p,.about ul{margin:0;font-weight:600;max-width:60ch}
+.about ul{padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.about a{color:var(--blue);font-weight:800}
+.about p+p{margin-top:8px}
+@media (max-width:420px){.teacher p{font-size:15px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1 id="h1">School <span>Drone</span></h1>
+    <div class="top"><div class="stats"><span data-i="pilot">Pilot</span>: <b id="pilot">Mia</b> &nbsp;·&nbsp; <span data-i="height">Height</span>: <b id="height">0.0 m</b></div>
+    <button class="langb" id="lang" type="button" lang="zh-Hant">中文</button></div>
+  </header>
+
+  <div class="scene"><canvas id="scene" aria-label="A library. Kids stand around a rug watching a drone fly. Tap anywhere to send the drone there."></canvas></div>
+
+  <div class="teacher" id="teacher">
+    <div class="bot" aria-hidden="true"><i></i></div>
+    <p><small data-i="teacherLabel">Robot drone teacher</small><span id="say" aria-live="polite">Hello! I am the robot teacher inside the drone. Press Up to take off.</span></p>
+    <button class="voice" id="voice" type="button">Voice: on</button>
+  </div>
+
+  <div class="row">
+    <section class="card fly" aria-label="Fly the drone">
+      <div class="pad">
+        <button class="key u" id="b-up" type="button" data-cmd="up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 11h-6v7H9v-7H3z" fill="currentColor"/></svg><span data-i="up">Up</span></button>
+        <button class="key l" id="b-left" type="button" data-cmd="left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l11-9v6h7v6h-7v6z" fill="currentColor"/></svg><span data-i="left">Left</span></button>
+        <button class="key h" id="b-hover" type="button" data-cmd="hover"><span data-i="hover">Hover</span></button>
+        <button class="key r" id="b-right" type="button" data-cmd="right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12L10 3v6H3v6h7v6z" fill="currentColor"/></svg><span data-i="right">Right</span></button>
+        <button class="key d" id="b-down" type="button" data-cmd="down"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21l9-11h-6V3H9v7H3z" fill="currentColor"/></svg><span data-i="down">Down</span></button>
+      </div>
+      <div class="tricks">
+        <button class="key eight" id="b-eight" type="button" data-cmd="eight"><b>8</b> <span data-i="bee">Bee dance</span></button>
+        <button class="key" id="b-land" type="button" data-cmd="land"><span data-i="land">Land</span></button>
+      </div>
+      <p class="hint" data-i="hint">Or tap the library to tell the drone where to go. Keyboard: arrows, space, 8, L.</p>
+    </section>
+
+    <div class="side">
+      <section class="card">
+        <h2 data-i="batH">3 batteries, so everyone gets a turn</h2>
+        <div class="bats" id="bats"></div>
+      </section>
+      <section class="card">
+        <h2 data-i="pickH">Pick a drone</h2>
+        <div class="styles" id="styles"></div>
+      </section>
+    </div>
+  </div>
+
+  <nav class="guides" aria-label="Guides">
+    <a id="g-how" data-i="gHow" href="https://ultralabed.github.io/School-Drone/how-to-play.html" target="_blank" rel="noopener">How to play</a>
+    <a id="g-rules" data-i="gRules" href="https://ultralabed.github.io/School-Drone/rules.html" target="_blank" rel="noopener">Rules</a>
+    <a id="g-faq" data-i="gFaq" href="https://ultralabed.github.io/School-Drone/faq.html" target="_blank" rel="noopener">Questions</a>
+  </nav>
+
+  <section class="card about" id="about">
+    <div>
+      <h2 data-i="learnH">What kids learn</h2>
+      <ul id="learn"></ul>
+    </div>
+    <div>
+      <h2 data-i="whoH">Who made this</h2>
+      <p><span data-i="who1">School Drone is a kids' project. The idea came from Aaron Shih. It was built by his dad,</span> <a href="https://www.linkedin.com/in/edward-shih-43942786" target="_blank" rel="noopener author">Edward Shih</a><span data-i="who2">.</span></p>
+      <p><span data-i="who3">It is free and open source under the MIT license. You may copy it and change it. Please keep the author's name.</span> <a href="https://github.com/ultralabed/School-Drone" target="_blank" rel="noopener" data-i="code">See the code on GitHub</a></p>
+    </div>
+  </section>
+</div>
+
+<script>
+(()=>{
+const W=800,H=500,TAU=Math.PI*2;
+const cv=document.getElementById('scene'),ctx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rand=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const F='"Baloo 2","PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';
+const L={
+en:{title:'School Drone Library',desc:'A free kids game. Fly a school drone in a library and let the robot teacher explain how drones fly.',
+ h1:'School <span>Drone</span>',pilot:'Pilot',height:'Height',other:'中文',
+ aria:'A library. Kids stand around a rug watching a drone fly. Tap anywhere to send the drone there.',
+ teacherLabel:'Robot drone teacher',hello:'Hello! I am the robot teacher inside the drone. Press Up to take off.',
+ voiceOn:'Voice: on',voiceOff:'Voice: off',up:'Up',down:'Down',left:'Left',right:'Right',hover:'Hover',bee:'Bee dance',land:'Land',
+ hint:'Or tap the library to tell the drone where to go. Keyboard: arrows, space, 8, L.',
+ batH:'3 batteries, so everyone gets a turn',pickH:'Pick a drone',
+ s_quad:'4 propellers',s_heli:'Helicopter',s_jet:'Jet',s_hex:'6 propellers',
+ tip_quad:'Four propellers! Two spin one way and two spin the other way. That keeps me steady.',
+ tip_heli:'Helicopter style! One big rotor on top lifts me. The little tail rotor stops me from spinning around.',
+ tip_jet:'Jet style! A jet pushes air out the back, and that pushes me forward. Whoosh!',
+ tip_hex:'Six propellers! If one stops working, the other five can still carry me home.',
+ inDrone:'In the drone',flying:'Flying',ready:'Ready',charging:'Charging',
+ wait:'All the batteries are charging. Let us wait a little bit.',hold:'Hold on! I am landing to get a fresh battery.',
+ already:'I am already on the landing pad.',landing:'Landing! I fly back to the yellow pad and come down slowly.',
+ eight:'Figure 8, like a bee! Bees dance in an 8 to tell their friends where the flowers are.',
+ hoverSay:'Hover means stay still in the air. The propellers push just hard enough to hold me up.',
+ ceiling:'That is as high as we go. The ceiling is right there!',
+ takeoff:'Take off! The propellers spin fast and push air down. That lifts me up.',goUp:'Going up! Faster propellers push more air down.',
+ lowEnough:'That is low enough. Press Land and I will go down to the pad.',goDown:'Going down. Slower propellers let me sink, nice and gentle.',
+ wall:'Stop! That is the wall. We keep away from walls and bookshelves.',
+ flyLeft:'Flying left. I lean a little to the left, and that makes me slide that way.',
+ flyRight:'Flying right. I lean a little to the right, and that makes me slide that way.',
+ fresh:n=>'Fresh battery in! '+n+', it is your turn to fly. The empty one is charging now.',
+ eightDone:n=>'Figure 8 done! Great flying, '+n+'!',
+ batLow:'Battery is getting low. We should land soon.',batEmpty:'Battery empty! I am coming down to the pad for a fresh battery.',
+ tap:'Okay! Flying to the spot you picked.',langSay:'Okay! I will speak English now.',
+ tips:['Tip: tap anywhere in the library and I will fly there.','Tip: always keep the drone away from people and faces.','Tip: small button presses make smooth flying.','Tip: watch my shadow on the floor. It shows where I am.','Tip: a good pilot lands before the battery is empty.'],
+ banner:'DRONE SCHOOL',sign1:'QUIET VOICES',sign2:'LOUD IDEAS',ask:'ASK ME',
+ pilots:['Mia','Leo','Zara','Sam','Ava','Kai'],
+ gHow:'How to play',gRules:'Rules',gFaq:'Questions and answers',
+ learnH:'What kids learn',whoH:'Who made this',who1:"School Drone is a kids' project. The idea came from Aaron Shih. It was built by his dad,",who2:'.',
+ who3:'It is free and open source under the MIT license. You may copy it and change it. Please keep the author\'s name.',code:'See the code on GitHub',
+ learn:['Up and down: when the propellers spin faster they push more air down, and the drone goes up.','Left and right: the drone leans a little, and then it slides that way.','Hover: the drone can stay still in the air.','Batteries: a good pilot lands before the battery is empty. With 3 batteries, kids take turns.','Safety: keep the drone away from people, walls and bookshelves.','Flying machines: 4 propellers, 6 propellers, a helicopter and a jet all fly in different ways.','Nature: bees dance in a figure 8 to show friends where the flowers are.']},
+zh:{title:'學校無人機圖書館',desc:'免費的兒童小遊戲。在圖書館裡飛學校無人機,機器人老師會告訴你無人機是怎麼飛的。',
+ h1:'學校<span>無人機</span>',pilot:'小飛行員',height:'高度',other:'English',
+ aria:'一間圖書館。小朋友圍著地毯看無人機飛。點任何地方,無人機就會飛過去。',
+ teacherLabel:'機器人無人機老師',hello:'哈囉!我是住在無人機裡的機器人老師。按「上」就可以起飛。',
+ voiceOn:'聲音:開',voiceOff:'聲音:關',up:'上',down:'下',left:'左',right:'右',hover:'懸停',bee:'蜜蜂舞',land:'降落',
+ hint:'也可以點圖書館,告訴無人機要飛去哪裡。鍵盤:方向鍵、空白鍵、8、L。',
+ batH:'3 顆電池,大家都可以輪流飛',pickH:'選一台無人機',
+ s_quad:'4 個螺旋槳',s_heli:'直升機',s_jet:'噴射機',s_hex:'6 個螺旋槳',
+ tip_quad:'四個螺旋槳!兩個往一邊轉,兩個往另一邊轉,這樣我才飛得穩。',
+ tip_heli:'直升機造型!上面的大螺旋槳把我抬起來,尾巴的小螺旋槳讓我不會一直轉圈圈。',
+ tip_jet:'噴射機造型!噴射機把空氣往後噴,空氣就把我往前推。咻!',
+ tip_hex:'六個螺旋槳!就算有一個壞掉,另外五個還是可以帶我回家。',
+ inDrone:'在無人機裡',flying:'飛行中',ready:'充飽了',charging:'充電中',
+ wait:'電池都在充電,我們等一下下。',hold:'等一下!我正在降落,要換一顆新電池。',
+ already:'我已經在降落墊上了。',landing:'降落!我飛回黃色的降落墊,慢慢下來。',
+ eight:'8 字飛行,像蜜蜂一樣!蜜蜂會跳 8 字舞,告訴朋友花在哪裡。',
+ hoverSay:'懸停就是停在空中不動。螺旋槳的力氣剛剛好把我撐住。',
+ ceiling:'不能再高了,上面就是天花板!',
+ takeoff:'起飛!螺旋槳轉得很快,把空氣往下推,我就飛起來了。',goUp:'往上飛!螺旋槳轉越快,往下推的空氣越多。',
+ lowEnough:'這樣夠低了。按「降落」,我就會回到降落墊。',goDown:'往下飛。螺旋槳轉慢一點,我就輕輕地下降。',
+ wall:'停!那邊是牆壁。我們要離牆壁和書櫃遠一點。',
+ flyLeft:'往左飛。我的身體往左邊斜一點點,就會往左邊滑過去。',
+ flyRight:'往右飛。我的身體往右邊斜一點點,就會往右邊滑過去。',
+ fresh:n=>'新電池裝好了!'+n+',換你飛了。沒電的那顆正在充電。',
+ eightDone:n=>'8 字飛完了!'+n+',你飛得好棒!',
+ batLow:'電池快沒電了,我們該準備降落了。',batEmpty:'電池沒電了!我要回降落墊換一顆新電池。',
+ tap:'好!我飛去你選的地方。',langSay:'好!我現在說中文。',
+ tips:['小提醒:點圖書館的任何地方,我就會飛過去。','小提醒:無人機要離人和臉遠遠的。','小提醒:輕輕按、慢慢按,飛起來才會順。','小提醒:看看地上的影子,就知道我在哪裡。','小提醒:好的飛行員會在電池沒電以前降落。'],
+ banner:'無人機學校',sign1:'說話小小聲',sign2:'想法大大的',ask:'問我',
+ pilots:['小美','小樂','小安','小山','小芸','小凱'],
+ gHow:'怎麼玩',gRules:'規則',gFaq:'常見問題',
+ learnH:'小朋友可以學到什麼',whoH:'這是誰做的',who1:'學校無人機是一個給小朋友的作品。點子來自 Aaron Shih,由他的爸爸',who2:' 製作。',
+ who3:'這個作品免費、開放原始碼,使用 MIT 授權。你可以複製、可以修改,請保留作者的名字。',code:'到 GitHub 看程式碼',
+ learn:['上和下:螺旋槳轉得越快,往下推的空氣越多,無人機就會往上飛。','左和右:無人機的身體斜一點點,就會往那一邊滑過去。','懸停:無人機可以停在空中不動。','電池:好的飛行員會在沒電以前降落。有 3 顆電池,大家可以輪流飛。','安全:無人機要離人、牆壁和書櫃遠一點。','飛行器:4 個螺旋槳、6 個螺旋槳、直升機和噴射機,飛的方法都不一樣。','大自然:蜜蜂會跳 8 字舞,告訴朋友花在哪裡。']}};
+let lang='en';
+const QL=(()=>{try{const q=new URLSearchParams(location.search).get('lang');return q==='zh'||q==='en'?q:null}catch(e){return null}})();
+try{const sv=QL||localStorage.getItem('sd-lang');lang=sv==='zh'||sv==='en'?sv:(/^zh/i.test(navigator.language||'')?'zh':'en')}catch(e){lang=/^zh/i.test(navigator.language||'')?'zh':'en'}
+const t=(k,a)=>{const v=L[lang][k]??L.en[k];return typeof v==='function'?v(a):v};
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+
+/* ---------- library background (drawn once) ---------- */
+let bg=document.createElement('canvas'),scale=1;
+function buildBg(){
+  bg.width=cv.width;bg.height=cv.height;
+  const c=bg.getContext('2d');c.setTransform(scale,0,0,scale,0,0);
+  let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  // wall + floor
+  c.fillStyle='#bfe0d2';c.fillRect(0,0,W,262);
+  c.fillStyle='#afd5c5';c.fillRect(0,200,W,62);
+  c.fillStyle='#e2b273';c.fillRect(0,262,W,H-262);
+  c.strokeStyle='rgba(120,70,20,.22)';c.lineWidth=1.5;
+  for(let y=262,s=14,i=0;y<H;y+=s,s*=1.22,i++){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();
+    for(let x=(i%2)*70+rnd()*60;x<W;x+=140){c.beginPath();c.moveTo(x,y);c.lineTo(x,y+s*1.22);c.stroke()}}
+  c.fillStyle='#8b5e3c';c.fillRect(0,255,W,9);
+  // banner
+  c.fillStyle='#ff8a1f';rr(c,300,14,200,32,8);c.fill();
+  c.fillStyle='#fff';c.font='800 20px '+F;c.textAlign='center';c.textBaseline='middle';c.fillText(t('banner'),400,31);
+  // door
+  c.fillStyle='#7a4f2e';rr(c,10,106,80,156,6);c.fill();
+  c.fillStyle='#3a2a22';c.fillRect(18,114,64,148);
+  c.fillStyle='#f6e9c8';c.fillRect(18,114,26,148);
+  c.fillStyle='#ffd24a';c.beginPath();c.arc(38,192,3,0,TAU);c.fill();
+  // window
+  c.fillStyle='#fff';rr(c,340,58,120,140,60);c.fill();
+  c.save();rr(c,348,66,104,124,52);c.clip();
+  c.fillStyle='#9ed4f5';c.fillRect(340,58,120,140);
+  c.fillStyle='#ffe27a';c.beginPath();c.arc(428,96,14,0,TAU);c.fill();
+  c.fillStyle='#6fbf73';c.beginPath();c.arc(372,186,34,0,TAU);c.arc(430,198,30,0,TAU);c.fill();
+  c.restore();
+  c.strokeStyle='#fff';c.lineWidth=5;c.beginPath();c.moveTo(400,62);c.lineTo(400,194);c.moveTo(344,132);c.lineTo(456,132);c.stroke();
+  // shelves
+  const cols=['#e4572e','#f2b134','#3b8ea5','#5b8c5a','#8e5ea2','#d1495b','#2e6f95','#f28f3b','#4d908e','#f9c74f'];
+  function shelf(x,y,w,h,rows){
+    c.fillStyle='#9c6b3f';rr(c,x,y,w,h,6);c.fill();
+    const rh=(h-8)/rows;
+    for(let r=0;r<rows;r++){
+      const ry=y+6+r*rh;c.fillStyle='#63402a';c.fillRect(x+7,ry,w-14,rh-7);
+      let bx=x+9;const bot=ry+rh-7;
+      while(bx<x+w-18){const bw=6+rnd()*7,bh=(rh-9)*(.62+rnd()*.36);
+        if(rnd()<.1){bx+=bw+3;continue}
+        c.fillStyle=cols[Math.floor(rnd()*cols.length)];c.fillRect(bx,bot-bh,bw,bh);
+        c.fillStyle='rgba(255,255,255,.35)';c.fillRect(bx+1.5,bot-bh+5,bw-3,2);
+        bx+=bw+1}
+    }
+  }
+  shelf(104,62,220,198,4);shelf(476,62,166,198,4);
+  // clock
+  c.fillStyle='#fff';c.strokeStyle='#1b2a3a';c.lineWidth=4;c.beginPath();c.arc(722,104,24,0,TAU);c.fill();c.stroke();
+  c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(722,104);c.lineTo(722,88);c.moveTo(722,104);c.lineTo(733,110);c.stroke();
+  c.fillStyle='#2e6f95';rr(c,672,150,100,34,6);c.fill();
+  c.fillStyle='#fff';c.font='800 13px '+F;c.fillText(t('sign1'),722,159);c.fillText(t('sign2'),722,174);
+  // rug + landing pad
+  c.fillStyle='#2e6f95';c.beginPath();c.ellipse(400,405,180,48,0,0,TAU);c.fill();
+  c.strokeStyle='#f9c74f';c.lineWidth=5;c.setLineDash([12,10]);c.beginPath();c.ellipse(400,405,164,41,0,0,TAU);c.stroke();c.setLineDash([]);
+  c.fillStyle='#f9c74f';c.beginPath();c.ellipse(400,394,44,13,0,0,TAU);c.fill();
+  c.fillStyle='#2e6f95';c.font='800 17px '+F;c.save();c.translate(400,395);c.scale(1.5,.6);c.fillText('H',0,0);c.restore();
+}
+
+/* ---------- drone drawing ---------- */
+const STYLES={
+  quad:{name:'4 propellers',main:'#ff8a1f',dark:'#c9620a',tip:'Four propellers! Two spin one way and two spin the other way. That keeps me steady.'},
+  heli:{name:'Helicopter',main:'#e4572e',dark:'#a8371a',tip:'Helicopter style! One big rotor on top lifts me. The little tail rotor stops me from spinning around.'},
+  jet:{name:'Jet',main:'#3b8ea5',dark:'#255f70',tip:'Jet style! A jet pushes air out the back, and that pushes me forward. Whoosh!'},
+  hex:{name:'6 propellers',main:'#5b8c5a',dark:'#3b6340',tip:'Six propellers! If one stops working, the other five can still carry me home.'}
+};
+function prop(c,x,y,r,o){
+  c.fillStyle='#2b3440';c.fillRect(x-1.5,y,3,5);
+  if(o.spin){c.fillStyle='rgba(40,55,75,.22)';c.beginPath();c.ellipse(x,y,r,3.2,0,0,TAU);c.fill();
+    const k=Math.cos(o.t*38+x);c.strokeStyle='rgba(30,40,55,.55)';c.lineWidth=2;c.beginPath();c.moveTo(x-r*k,y);c.lineTo(x+r*k,y);c.stroke()}
+  else{c.strokeStyle='#2b3440';c.lineWidth=2.5;c.lineCap='round';c.beginPath();c.moveTo(x-r,y);c.lineTo(x+r,y);c.stroke()}
+}
+function face(c,x,y,w,h,o,ax){
+  // antenna (the teacher's mic)
+  c.strokeStyle='#2b3440';c.lineWidth=2;c.beginPath();c.moveTo(ax,y-2);c.lineTo(ax,y-11);c.stroke();
+  c.fillStyle='#ff3b3b';c.beginPath();c.arc(ax,y-12,2.6,0,TAU);c.fill();
+  if(o.talk){c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=1.6;for(let i=1;i<=2;i++){const r=4+i*4+(o.t*10%4);
+    c.beginPath();c.arc(ax,y-12,r,-2.4,-.75);c.stroke()}}
+  c.fillStyle='#16324a';rr(c,x-w/2,y,w,h,4);c.fill();
+  const blink=(o.t%4)>3.85;c.fillStyle='#6fe6ff';
+  if(blink){c.fillRect(x-w*.27-2,y+h*.4,4,1.2);c.fillRect(x+w*.27-2,y+h*.4,4,1.2)}
+  else{c.beginPath();c.arc(x-w*.24,y+h*.4,2,0,TAU);c.arc(x+w*.24,y+h*.4,2,0,TAU);c.fill()}
+  const mh=o.talk?1+Math.abs(Math.sin(o.t*14))*3:1.2;c.fillRect(x-3,y+h*.72-mh/2,6,mh);
+}
+function skids(c){c.strokeStyle='#2b3440';c.lineWidth=2.5;c.lineCap='round';c.beginPath();
+  c.moveTo(-11,9);c.lineTo(-14,16);c.moveTo(11,9);c.lineTo(14,16);c.moveTo(-21,16);c.lineTo(21,16);c.stroke()}
+function drawDrone(c,style,o){
+  const S=STYLES[style];c.save();c.rotate(o.tilt||0);c.lineCap='round';
+  if(style==='quad'||style==='hex'){
+    const arms=style==='quad'?[[24,-15,12],[41,-9,17]]:[[13,-20,10],[29,-15,13],[46,-9,15]];
+    for(const [ax,ay,r] of arms)for(const s of[-1,1]){
+      c.strokeStyle='#3a4654';c.lineWidth=4;c.beginPath();c.moveTo(s*12,-3);c.lineTo(s*ax,ay+5);c.stroke();prop(c,s*ax,ay,r,o)}
+    skids(c);c.fillStyle=S.main;rr(c,-22,-10,44,21,style==='hex'?10.5:8);c.fill();
+    c.fillStyle=S.dark;rr(c,-22,6,44,5,2.5);c.fill();
+    face(c,0,-7,26,13,o,0);
+  }else if(style==='heli'){
+    c.scale(o.facing||1,1);
+    c.fillStyle=S.dark;c.beginPath();c.moveTo(-16,-5);c.lineTo(-54,-9);c.lineTo(-54,-4);c.lineTo(-16,5);c.fill();
+    c.beginPath();c.moveTo(-48,-8);c.lineTo(-60,-22);c.lineTo(-54,-6);c.fill();
+    c.fillStyle='rgba(40,55,75,.25)';c.beginPath();c.arc(-56,-8,8,0,TAU);c.fill();
+    const a=o.spin?o.t*30:.6;c.strokeStyle='#2b3440';c.lineWidth=2;c.beginPath();c.moveTo(-56-8*Math.cos(a),-8-8*Math.sin(a));c.lineTo(-56+8*Math.cos(a),-8+8*Math.sin(a));c.stroke();
+    skids(c);c.fillStyle=S.main;c.beginPath();c.ellipse(0,0,27,14,0,0,TAU);c.fill();
+    c.fillStyle='#2b3440';c.fillRect(-2.5,-21,5,8);prop(c,0,-22,44,o);
+    face(c,5,-8,24,13,o,-14);
+  }else{
+    c.scale(o.facing||1,1);
+    if(o.spin){const f=10+Math.abs(Math.sin(o.t*40))*10;c.fillStyle='#ffb11f';c.beginPath();c.moveTo(-34,-5);c.lineTo(-36-f,0);c.lineTo(-34,5);c.fill();
+      c.fillStyle='#fff3a6';c.beginPath();c.moveTo(-34,-2.5);c.lineTo(-36-f*.5,0);c.lineTo(-34,2.5);c.fill()}
+    c.fillStyle=S.dark;c.beginPath();c.moveTo(-22,-7);c.lineTo(-38,-23);c.lineTo(-30,-7);c.fill();
+    c.fillStyle='#2b3440';c.beginPath();c.arc(15,13,3,0,TAU);c.arc(-20,13,3,0,TAU);c.fill();
+    c.fillStyle=S.main;c.beginPath();c.moveTo(42,1);c.quadraticCurveTo(22,-11,6,-10);c.lineTo(-30,-8);c.lineTo(-36,0);c.lineTo(-30,8);c.lineTo(10,10);c.quadraticCurveTo(30,9,42,1);c.fill();
+    c.fillStyle=S.dark;c.beginPath();c.moveTo(8,3);c.lineTo(-16,3);c.lineTo(-30,17);c.lineTo(-12,17);c.fill();
+    face(c,8,-8,22,11,o,-8);
+  }
+  c.restore();
+}
+
+/* ---------- people ---------- */
+const SKIN=['#f6d2b0','#e9b98f','#c98a5e','#8d5a3b','#f2c9a0','#a86f49'];
+const HAIR=['#2b1d14','#5a3a1e','#d9a441','#b5522a','#111','#7a4a2a'];
+const SHIRT=['#e4572e','#f2b134','#3b8ea5','#5b8c5a','#8e5ea2','#d1495b','#f28f3b','#4d908e','#ff7aa8','#6c8cff'];
+const PANTS=['#33475b','#4a3f6b','#2f5d50','#6b4a3a','#1f3a5f'];
+const DOOR={x:52,y:278};
+const spots=[];
+for(const a of[205,228,252,288,312,335,22,55,90,125,158]){const r=a*Math.PI/180;
+  spots.push({x:400+218*Math.cos(r),y:408+58*Math.sin(r)*-1*(a>180?-1:1)*(a>180?1:-1),role:'watch'})}
+// fix y: back row (angles 180-360) sits higher on screen, front row lower
+spots.forEach((s,i)=>{const a=[205,228,252,288,312,335,22,55,90,125,158][i]*Math.PI/180;s.y=408-58*Math.sin(a)*(a>Math.PI?1:1);s.y=a>Math.PI?408+58*Math.sin(a):408+58*Math.sin(a)});
+const TABLES=[{x:112,y:424},{x:692,y:428}],BAGS=[{x:232,y:306,c:'#d1495b'},{x:612,y:308,c:'#8e5ea2'}];
+for(const t of TABLES){spots.push({x:t.x-26,y:t.y-8,role:'read'},{x:t.x+26,y:t.y-8,role:'read'})}
+for(const b of BAGS)spots.push({x:b.x,y:b.y-5,role:'read'});
+const kids=[];
+function newKid(placed){
+  const free=spots.filter(s=>!s.taken);if(!free.length)return;
+  const s=pick(free);s.taken=true;
+  const k={spot:s,role:s.role,x:DOOR.x,y:DOOR.y,state:'in',timer:0,phase:rand(0,6),sc:rand(.88,1.06),
+    skin:pick(SKIN),hair:pick(HAIR),shirt:pick(SHIRT),pants:pick(PANTS),hs:Math.floor(rand(0,3)),book:pick(SHIRT),dir:1};
+  if(placed){k.x=s.x;k.y=s.y;k.state='stay';k.timer=rand(6,45)}
+  kids.push(k);
+}
+const lib={x:722,y:290,st:'desk',timer:4,phase:0,sc:1.3,skin:'#e9b98f',hair:'#6b6b78',shirt:'#7a5ea8',pants:'#33475b',hs:3,adult:true,dir:-1,book:'#f2b134',role:'lib',state:'stay'};
+
+function drawPerson(c,k,t){
+  const walking=k.state!=='stay',sit=!walking&&k.role==='read';
+  const cheer=!walking&&k.role==='watch'&&t<cheerUntil;
+  const hop=cheer?Math.abs(Math.sin(t*9+k.phase))*7:walking?Math.abs(Math.sin(k.phase*9))*2:0;
+  c.save();c.translate(k.x,k.y);c.scale(k.sc,k.sc);
+  if(walking&&!k.adult)c.globalAlpha=clamp(Math.hypot(k.x-DOOR.x,k.y-DOOR.y)/28,0,1);
+  c.lineCap='round';
+  if(!sit){const sw=walking?Math.sin(k.phase*9)*5:0;c.strokeStyle=k.pants;c.lineWidth=6.5;c.beginPath();
+    c.moveTo(-5,-20-hop);c.lineTo(-5+sw,-1-hop*.4);c.moveTo(5,-20-hop);c.lineTo(5-sw,-1-hop*.4);c.stroke()}
+  c.translate(0,-hop+(sit?6:0));
+  c.fillStyle=k.shirt;rr(c,-11,-44,22,27,7);c.fill();
+  c.strokeStyle=k.shirt;c.lineWidth=5.5;c.beginPath();
+  const carry=sit||(walking&&(k.role==='read'||k.carry));
+  if(cheer){c.moveTo(-10,-39);c.lineTo(-17,-58);c.moveTo(10,-39);c.lineTo(17,-58)}
+  else if(carry){c.moveTo(-10,-39);c.lineTo(-7,-27);c.moveTo(10,-39);c.lineTo(7,-27)}
+  else{const sw=walking?Math.sin(k.phase*9)*4:0;c.moveTo(-11,-39);c.lineTo(-14-sw*.3,-24+sw);c.moveTo(11,-39);c.lineTo(14+sw*.3,-24-sw)}
+  c.stroke();
+  if(carry){c.fillStyle=k.book;rr(c,-10,-35,20,12,2);c.fill();c.fillStyle='#fff';c.fillRect(-8,-33,7,8);c.fillRect(1,-33,7,8)}
+  // head
+  c.fillStyle=k.skin;c.beginPath();c.arc(0,-54,11,0,TAU);c.fill();
+  c.fillStyle=k.hair;c.beginPath();c.arc(0,-56,11.6,Math.PI,0);c.fill();
+  if(k.hs===1){c.beginPath();c.arc(-12.5,-52,4.2,0,TAU);c.arc(12.5,-52,4.2,0,TAU);c.fill()}
+  else if(k.hs===2){c.fillRect(-11.6,-57,4,12);c.fillRect(7.6,-57,4,12)}
+  else if(k.hs===3){c.beginPath();c.arc(0,-68,5.5,0,TAU);c.fill()}
+  let ex=0,ey=0;
+  if(k.role==='watch'&&!walking){ex=clamp((D.x-k.x)/150,-1,1)*2.6;ey=clamp((droneY()-(k.y-54))/150,-1,1)*2.2}
+  else if(sit||(k.adult&&!walking)){ey=2}else ex=k.dir*2.2;
+  c.fillStyle='#1b2a3a';c.beginPath();c.arc(-4+ex,-53+ey,1.7,0,TAU);c.arc(4+ex,-53+ey,1.7,0,TAU);c.fill();
+  if(k.adult){c.strokeStyle='#1b2a3a';c.lineWidth=1.1;c.beginPath();c.arc(-4+ex*.5,-53+ey*.5,3.6,0,TAU);c.moveTo(7.6+ex*.5,-53+ey*.5);c.arc(4+ex*.5,-53+ey*.5,3.6,0,TAU);c.stroke()}
+  if(cheer){c.fillStyle='#7a2b2b';c.beginPath();c.arc(ex*.5,-47.5,2.6,0,TAU);c.fill()}
+  else{c.strokeStyle='#7a2b2b';c.lineWidth=1.4;c.beginPath();c.arc(ex*.5,-49.5,3.2,.25,Math.PI-.25);c.stroke()}
+  c.restore();
+}
+function drawTable(c,t){c.strokeStyle='#8b5e3c';c.lineWidth=6;c.lineCap='round';c.beginPath();c.moveTo(t.x-42,t.y-26);c.lineTo(t.x-42,t.y);c.moveTo(t.x+42,t.y-26);c.lineTo(t.x+42,t.y);c.stroke();
+  c.fillStyle='#a8703f';c.beginPath();c.ellipse(t.x,t.y-25,64,15,0,0,TAU);c.fill();
+  c.fillStyle='#c98b4e';c.beginPath();c.ellipse(t.x,t.y-29,64,15,0,0,TAU);c.fill();
+  c.fillStyle='#3b8ea5';rr(c,t.x-9,t.y-36,18,7,2);c.fill();c.fillStyle='#f2b134';rr(c,t.x-7,t.y-41,15,6,2);c.fill()}
+function drawBag(c,b){c.fillStyle=b.c;c.beginPath();c.ellipse(b.x,b.y-13,30,17,0,0,TAU);c.fill();
+  c.fillStyle='rgba(255,255,255,.18)';c.beginPath();c.ellipse(b.x-8,b.y-19,14,6,-.3,0,TAU);c.fill()}
+function drawDesk(c){c.fillStyle='#8b5e3c';rr(c,654,268,138,36,5);c.fill();c.fillStyle='#c98b4e';rr(c,650,258,146,14,5);c.fill();
+  c.fillStyle='#2b3440';rr(c,752,232,32,24,3);c.fill();c.fillStyle='#9ed4f5';c.fillRect(755,235,26,18);c.fillStyle='#2b3440';c.fillRect(765,255,6,5);
+  const bc=['#e4572e','#5b8c5a','#f2b134'];bc.forEach((col,i)=>{c.fillStyle=col;rr(c,662+i*2,250-i*6,30-i*3,6,1.5);c.fill()});
+  c.fillStyle='#f6e9c8';rr(c,694,278,58,17,3);c.fill();c.fillStyle='#63402a';c.font='800 11px '+F;c.textAlign='center';c.textBaseline='middle';c.fillText(t('ask'),723,287)}
+
+/* ---------- drone state, batteries, teacher ---------- */
+const D={x:400,alt:0,tx:400,ta:0,mode:'landed',facing:1,vx:0,style:'quad',et:0,cx:400,ca:120,forced:false};
+const droneY=()=>376-D.alt;
+const bats=[100,100,100];let active=0,waiting=false,lowSaid=false;
+let PILOTS=L[lang].pilots;let pilot=0;
+let now=0,talkUntil=0,cheerUntil=0,lastCmd='',lastAct=0,voiceOn=true;
+const sayEl=$('say'),teacherEl=$('teacher');
+/* speech: one-slot queue, voice picker, no cancel+speak in the same tick */
+let spBusy=false,spSince=0,spCur=null,spText='',spPend=null,spTimer=0,spVoice=null,spHave=0;
+const SP_GOOD=/natural|neural|premium|enhanced|online|google|siri/i,
+ SP_ZH=/mei-?jia|hsiaochen|hsiaoyu|國語|臺灣|台灣/i,SP_EN=/samantha|aria|jenny|ava|google us english/i,
+ SP_BAD=/espeak|compact|albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|zarvox|trinoids|whisper|jester|organ|superstar|fred|junior|ralph|kathy/i;
+function voiceScore(v){
+  const l=String(v.lang||'').replace('_','-').toLowerCase(),n=String(v.name||''),zh=lang==='zh';let s;
+  if(zh){if(l.indexOf('zh')!==0&&l.indexOf('yue')!==0)return -1e9;
+    s=l==='zh-tw'?100:l.indexOf('zh-hant')===0?80:(l==='zh-hk'||l.indexOf('yue')===0||/cantonese|粵|廣東/i.test(n))?10:50}
+  else{if(l.indexOf('en')!==0)return -1e9;s=l==='en-us'?100:l==='en-gb'?80:50}
+  if(SP_GOOD.test(n))s+=60;if((zh?SP_ZH:SP_EN).test(n))s+=50;
+  if(/espeak/i.test(n))s-=300;if(SP_BAD.test(n))s-=200;return s}
+function pickVoice(){
+  spVoice=null;spHave=0;
+  try{const vs=speechSynthesis.getVoices()||[];spHave=vs.length;let best=-1e8;
+    vs.forEach(v=>{const s=voiceScore(v);if(s>best&&s>-1e8){best=s;spVoice=v}})}catch(e){}
+}
+try{speechSynthesis.addEventListener('voiceschanged',pickVoice)}catch(e){}
+function spStop(){
+  clearTimeout(spTimer);spPend=null;spBusy=false;spCur=null;spText='';
+  try{speechSynthesis.cancel()}catch(e){}
+}
+function spNext(){
+  const p=spPend;spPend=null;
+  if(p&&Date.now()-p.t<4000)spStart(p.text);
+}
+function spStart(text){
+  spBusy=true;spSince=Date.now();spText=text;
+  try{
+    if(lang==='zh')text=text.replace(/[「」]/g,'').replace(/(\d) (?=[㐀-鿿])/g,'$1');
+    if(!spVoice&&spHave)pickVoice();
+    if(spHave&&!spVoice){spBusy=false;spText='';return}
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=lang==='zh'?'zh-TW':'en-US';u.rate=lang==='zh'?.95:1;u.pitch=lang==='zh'?1:1.05;u.volume=1;
+    if(spVoice)u.voice=spVoice;
+    const done=()=>{if(u!==spCur)return;spBusy=false;spCur=null;spText='';spNext()};
+    u.onstart=()=>{if(u===spCur)spSince=Date.now()};u.onend=done;u.onerror=done;
+    spCur=u;speechSynthesis.speak(u);
+  }catch(e){spBusy=false;spCur=null;spText=''}
+}
+function say(text,speak,urgent){
+  sayEl.textContent=text;talkUntil=now+Math.min(7,1.2+text.length*.06);
+  if(speak===false||!voiceOn)return;
+  try{
+    if(spBusy&&Date.now()-spSince>12000){spBusy=false;spCur=null;spText=''}
+    if(urgent){
+      clearTimeout(spTimer);spPend=null;spCur=null;spBusy=true;spSince=Date.now();spText=text;
+      try{speechSynthesis.cancel()}catch(e){}
+      spTimer=setTimeout(()=>{if(voiceOn)spStart(text);else spBusy=false},80);return}
+    if(text===spText||(spPend&&spPend.text===text))return;
+    if(!spBusy)spStart(text);else spPend={text:text,t:Date.now()};
+  }catch(e){}
+}
+$('voice').addEventListener('click',()=>{voiceOn=!voiceOn;$('voice').textContent=t(voiceOn?'voiceOn':'voiceOff');if(!voiceOn)spStop()});
+
+function blocked(){
+  if(waiting){say(t('wait'));return true}
+  if(D.forced){say(t('hold'));return true}
+  return false}
+function cmd(c){
+  if(blocked())return;lastAct=now;
+  const first=c!==lastCmd;lastCmd=c;
+  const landed=D.mode==='landed';
+  if(c==='land'){if(landed){say(t('already'));return}
+    D.mode='land';D.tx=400;D.ta=0;say(t('landing'));return}
+  if(c==='eight'){
+    if(landed){D.alt=.1}
+    D.cx=clamp(D.x,180,620);D.ca=clamp(Math.max(D.alt,120),90,260);D.et=0;D.mode='eight';cheerUntil=now+10;
+    say(t('eight'));return}
+  if(landed||D.mode==='eight'||D.mode==='land'){D.tx=D.x;D.ta=landed?70:D.alt}
+  D.mode='goto';
+  if(c==='hover'){D.tx=D.x;D.ta=landed?70:D.alt;say(t('hoverSay'));return}
+  if(c==='up'){if(D.ta>=320){say(t('ceiling'));return}
+    D.ta=Math.min(320,D.ta+(landed?0:70));if(first||landed)say(t(landed?'takeoff':'goUp'))}
+  if(c==='down'){if(D.ta<=30){say(t('lowEnough'));return}
+    D.ta=Math.max(30,D.ta-70);if(first)say(t('goDown'))}
+  if(c==='left'||c==='right'){const s=c==='left'?-1:1,nx=clamp(D.tx+s*90,60,740);
+    if(nx===D.tx){say(t('wall'));return}
+    D.tx=nx;if(first)say(t(c==='left'?'flyLeft':'flyRight'))}
+}
+function trySwap(quiet){
+  let best=-1;for(let i=0;i<3;i++)if(i!==active&&(best<0||bats[i]>bats[best]))best=i;
+  if(bats[best]>=25){active=best;pilot=(pilot+1)%PILOTS.length;D.forced=false;waiting=false;lowSaid=false;
+    $('pilot').textContent=PILOTS[pilot];say(t('fresh',PILOTS[pilot]),true,true)}
+  else if(!quiet){waiting=true;say(t('wait'))}
+}
+const TIPS=['Tip: tap anywhere in the library and I will fly there.','Tip: always keep the drone away from people and faces.','Tip: small button presses make smooth flying.','Tip: watch my shadow on the floor. It shows where I am.','Tip: a good pilot lands before the battery is empty.'];
+
+/* ---------- update ---------- */
+let spawnT=1.5,tipI=0;
+function update(dt){
+  // drone
+  if(D.mode==='eight'){D.et+=dt*1.5;D.tx=D.cx+115*Math.sin(D.et);D.ta=D.ca+48*Math.sin(2*D.et);
+    if(D.et>=TAU*2){D.mode='goto';D.tx=D.cx;D.ta=D.ca;cheerUntil=now+1.5;say(t('eightDone',PILOTS[pilot]))}}
+  if(D.mode!=='landed'){
+    const g=D.mode==='eight'?6:2.6,m=D.mode==='eight'?420:210;
+    D.vx=clamp((D.tx-D.x)*g,-m,m);const va=clamp((D.ta-D.alt)*g,-m,m);
+    D.x+=D.vx*dt;D.alt=Math.max(0,D.alt+va*dt);
+    if(Math.abs(D.vx)>10)D.facing=Math.sign(D.vx);
+    if(D.mode==='land'&&D.alt<1.5&&Math.abs(D.x-400)<3){D.alt=0;D.x=400;D.vx=0;D.mode='landed';lastCmd='';
+      if(D.forced)trySwap();}
+    bats[active]-=dt*100/35;
+    if(bats[active]<=22&&!lowSaid&&bats[active]>0){lowSaid=true;say(t('batLow'),true,true)}
+    if(bats[active]<=0&&!D.forced){bats[active]=0;D.forced=true;D.mode='land';D.tx=400;D.ta=0;say(t('batEmpty'),true,true)}
+  }else D.vx=0;
+  if(waiting)trySwap(true);
+  for(let i=0;i<3;i++)if(i!==active)bats[i]=Math.min(100,bats[i]+dt*100/50);
+  if(now-lastAct>14&&now>talkUntil+6){lastAct=now;say(t('tips')[tipI++%5],false)}
+  // kids
+  spawnT-=dt;if(spawnT<=0){spawnT=rand(2,5);if(kids.length<14)newKid(false)}
+  for(let i=kids.length-1;i>=0;i--){const k=kids[i];
+    if(k.state==='stay'){k.timer-=dt;if(k.timer<=0&&!(k.role==='watch'&&now<cheerUntil)){k.state='out';k.spot.taken=false}continue}
+    const tx=k.state==='in'?k.spot.x:DOOR.x,ty=k.state==='in'?k.spot.y:DOOR.y,dx=tx-k.x,dy=ty-k.y,d=Math.hypot(dx,dy);
+    k.phase+=dt;k.dir=dx<0?-1:1;
+    if(d<2){if(k.state==='in'){k.state='stay';k.x=tx;k.y=ty;k.timer=rand(14,50)}else kids.splice(i,1)}
+    else{const s=Math.min(d,62*dt);k.x+=dx/d*s;k.y+=dy/d*s}}
+  // librarian
+  lib.phase+=dt;
+  if(lib.st==='desk'||lib.st==='shelf'){lib.state='stay';lib.timer-=dt;if(lib.timer<=0){if(lib.st==='desk'){lib.st='toShelf';lib.carry=true}else{lib.st='toDesk';lib.carry=false}}}
+  else{lib.state='walk';const tx=lib.st==='toShelf'?512:722,ty=lib.st==='toShelf'?286:290,dx=tx-lib.x,d=Math.abs(dx);lib.dir=Math.sign(dx)||1;
+    if(d<2){lib.x=tx;lib.y=ty;if(lib.st==='toShelf'){lib.st='shelf';lib.timer=3}else{lib.st='desk';lib.timer=rand(5,9)}}
+    else{lib.x+=lib.dir*Math.min(d,48*dt);lib.y+=(ty-lib.y)*.1}}
+}
+
+/* ---------- draw ---------- */
+function draw(){
+  ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(bg,0,0);ctx.setTransform(scale,0,0,scale,0,0);
+  const flying=D.mode!=='landed';
+  // shadow
+  const sh=1-D.alt/480;ctx.fillStyle='rgba(10,20,40,'+(.12+.2*sh)+')';ctx.beginPath();ctx.ellipse(D.x,394,38*sh,8*sh,0,0,TAU);ctx.fill();
+  // tap target
+  if(D.mode==='goto'&&Math.hypot(D.tx-D.x,D.ta-D.alt)>12){ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=2.5;ctx.setLineDash([5,5]);
+    ctx.beginPath();ctx.arc(D.tx,376-D.ta,12+Math.sin(now*6)*2,0,TAU);ctx.stroke();ctx.setLineDash([])}
+  const items=[];
+  for(const k of kids)items.push({y:k.y,f:()=>drawPerson(ctx,k,now)});
+  for(const t of TABLES)items.push({y:t.y,f:()=>drawTable(ctx,t)});
+  for(const b of BAGS)items.push({y:b.y-12,f:()=>drawBag(ctx,b)});
+  items.push({y:lib.y,f:()=>drawPerson(ctx,lib,now)},{y:303,f:()=>drawDesk(ctx)});
+  items.push({y:394,f:()=>{ctx.save();ctx.translate(D.x,droneY()+(flying?Math.sin(now*3)*3:0));ctx.scale(1.15,1.15);
+    drawDrone(ctx,D.style,{t:now,spin:flying,talk:now<talkUntil,facing:D.facing,tilt:clamp(D.vx/900,-.25,.25)});ctx.restore()}});
+  items.sort((a,b)=>a.y-b.y);for(const it of items)it.f();
+}
+
+/* ---------- DOM: batteries, styles, controls ---------- */
+const batEls=bats.map((_,i)=>{const d=document.createElement('div');d.className='bat';
+  d.innerHTML='<div class="cell"><i></i></div><span></span>';$('bats').appendChild(d);return d});
+function hud(){
+  bats.forEach((v,i)=>{const d=batEls[i],on=i===active;
+    d.className='bat'+(on?' on':'')+(v<=1?' empty':v<25?' low':'');
+    d.firstChild.firstChild.style.width='calc('+Math.max(0,v)+'% - 4px)';
+    const st=t(on?(D.mode==='landed'?'inDrone':'flying'):v>=100?'ready':'charging');
+    const txt=Math.round(v)+'% <em>'+st+'</em>';if(d.lastChild.innerHTML!==txt)d.lastChild.innerHTML=txt});
+  const h=(D.alt/100).toFixed(1)+' m';if($('height').textContent!==h)$('height').textContent=h;
+  teacherEl.classList.toggle('talk',now<talkUntil);
+}
+const styleBtns={};
+for(const id in STYLES){const b=document.createElement('button');b.type='button';b.id='style-'+id;b.setAttribute('aria-pressed',id===D.style);
+  const c=document.createElement('canvas');c.width=168;c.height=104;const x=c.getContext('2d');x.translate(84,58);x.scale(1.25,1.25);
+  drawDrone(x,id,{t:0,spin:false,talk:false,facing:1,tilt:0});
+  b.appendChild(c);b.appendChild(b._l=document.createTextNode(t('s_'+id)));
+  b.addEventListener('click',()=>{D.style=id;for(const k in styleBtns)styleBtns[k].setAttribute('aria-pressed',k===id);lastAct=now;say(t('tip_'+id))});
+  styleBtns[id]=b;$('styles').appendChild(b)}
+
+document.querySelectorAll('[data-cmd]').forEach(b=>{
+  const c=b.dataset.cmd,rep=['up','down','left','right'].includes(c);let iv=0;
+  const stop=()=>{clearInterval(iv);iv=0};
+  b.addEventListener('pointerdown',e=>{e.preventDefault();b.focus();cmd(c);if(rep){stop();iv=setInterval(()=>cmd(c),300)}});
+  for(const ev of['pointerup','pointerleave','pointercancel'])b.addEventListener(ev,stop);
+  b.addEventListener('click',e=>{if(e.detail===0)cmd(c)});
+});
+const KEYS={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',' ':'hover','8':'eight',l:'land',L:'land'};
+addEventListener('keydown',e=>{const c=KEYS[e.key];if(!c||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key===' '&&e.target.tagName==='BUTTON')return;
+  e.preventDefault();cmd(c);const b=document.querySelector('[data-cmd="'+c+'"]');b.classList.add('down');setTimeout(()=>b.classList.remove('down'),120)});
+cv.addEventListener('pointerdown',e=>{const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*W,py=(e.clientY-r.top)/r.height*H;
+  if(blocked())return;lastAct=now;lastCmd='tap';D.mode='goto';D.tx=clamp(px,60,740);D.ta=clamp(376-py,30,320);
+  say(t('tap'))});
+
+/* ---------- language ---------- */
+function applyLang(first){
+  PILOTS=L[lang].pilots;$('pilot').textContent=PILOTS[pilot];
+  document.documentElement.lang=lang==='zh'?'zh-Hant-TW':'en';document.title=t('title');
+  const m=document.querySelector('meta[name="description"]');if(m)m.content=t('desc');
+  $('h1').innerHTML=t('h1');cv.setAttribute('aria-label',t('aria'));
+  document.querySelectorAll('[data-i]').forEach(e=>{e.textContent=t(e.dataset.i)});
+  $('lang').textContent=t('other');$('lang').lang=lang==='zh'?'en':'zh-Hant';
+  $('voice').textContent=t(voiceOn?'voiceOn':'voiceOff');
+  for(const g of['how-to-play','rules','faq'])$({'how-to-play':'g-how',rules:'g-rules',faq:'g-faq'}[g]).href='https://ultralabed.github.io/School-Drone/'+(lang==='zh'?'zh/':'')+g+'.html';
+  $('learn').innerHTML='';for(const x of t('learn')){const li=document.createElement('li');li.textContent=x;$('learn').appendChild(li)}
+  for(const k in styleBtns)styleBtns[k]._l.nodeValue=t('s_'+k);
+  if(first){sayEl.textContent=t('hello');pickVoice()}else{buildBg();spStop();pickVoice();say(t('langSay'),true,true)}
+}
+$('lang').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';try{localStorage.setItem('sd-lang',lang)}catch(e){}applyLang(false)});
+applyLang(true);
+
+/* ---------- boot ---------- */
+function resize(){const w=cv.clientWidth||W;scale=Math.min((window.devicePixelRatio||1)*w/W,2.5);
+  cv.width=Math.round(W*scale);cv.height=Math.round(H*scale);scale=cv.width/W;buildBg();draw()}
+for(let i=0;i<10;i++)newKid(true);
+resize();
+if(window.ResizeObserver)new ResizeObserver(resize).observe(cv);else addEventListener('resize',resize);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{buildBg()});
+let last=performance.now();
+function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;now+=dt;update(dt);draw();hud();requestAnimationFrame(frame)}
+hud();requestAnimationFrame(frame);
+})();
+</script>

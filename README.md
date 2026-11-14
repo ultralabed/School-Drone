@@ -36,7 +36,7 @@ Open `index.html` in a web browser. There is nothing to install.
 
 ## License and credit
 
-Made by [Edward Shih](https://www.linkedin.com/in/edward-shih-43942786).
+Idea by Aaron Shih. Built by his dad, [Edward Shih](https://www.linkedin.com/in/edward-shih-43942786).
 
 MIT license. You may use, copy and change this project. Please keep the
 copyright line from the [LICENSE](LICENSE) file so people can find the author.

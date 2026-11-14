@@ -3,24 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- School Drone - MIT License - Copyright (c) 2026 Edward Shih - https://www.linkedin.com/in/edward-shih-43942786 -->
-<meta name="description" content="A free kids game. Fly a school drone in a library and let the robot teacher explain how drones fly.">
-<meta name="author" content="Edward Shih">
+<!-- School Drone - MIT License - Copyright (c) 2026 Aaron Shih and Edward Shih - https://www.linkedin.com/in/edward-shih-43942786 -->
+<meta name="description" content="A free browser game for kids. Fly a school drone in a library and let the robot teacher explain how drones go up, down, left, right and hover.">
+<meta name="author" content="Aaron Shih and Edward Shih">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#ff8a1f">
 <link rel="author" href="https://www.linkedin.com/in/edward-shih-43942786">
 <link rel="canonical" href="https://ultralabed.github.io/School-Drone/">
+<link rel="alternate" hreflang="en" href="https://ultralabed.github.io/School-Drone/">
+<link rel="alternate" hreflang="zh-Hant-TW" href="https://ultralabed.github.io/School-Drone/?lang=zh">
+<link rel="alternate" hreflang="x-default" href="https://ultralabed.github.io/School-Drone/">
 <link rel="license" href="https://github.com/ultralabed/School-Drone/blob/main/LICENSE">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
-<meta property="og:title" content="School Drone: learn to fly a drone in the library | 學校無人機">
-<meta property="og:description" content="A free kids game in English and Chinese. A robot teacher inside the drone explains how drones fly. 免費兒童小遊戲,機器人老師教你無人機怎麼飛。">
+<meta property="og:site_name" content="School Drone">
+<meta property="og:title" content="School Drone: Free Drone Flying Game for Kids">
+<meta property="og:description" content="A free browser game for kids. Fly a school drone in a library and let the robot teacher explain how drones go up, down, left, right and hover.">
 <meta property="og:url" content="https://ultralabed.github.io/School-Drone/">
 <meta property="og:image" content="https://ultralabed.github.io/School-Drone/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kids in a library watch a small orange drone fly above a blue rug.">
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="School Drone: Free Drone Flying Game for Kids">
+<meta name="twitter:description" content="A free browser game for kids. Fly a school drone in a library and let the robot teacher explain how drones go up, down, left, right and hover.">
+<meta name="twitter:image" content="https://ultralabed.github.io/School-Drone/og.png">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":["VideoGame","LearningResource"],"name":"School Drone","alternateName":"學校無人機","url":"https://ultralabed.github.io/School-Drone/","image":"https://ultralabed.github.io/School-Drone/og.png","description":"A free browser game for kids. Fly a school drone in a library while a robot teacher explains how drones fly.","inLanguage":["en","zh-Hant-TW"],"isAccessibleForFree":true,"license":"https://opensource.org/licenses/MIT","genre":"Educational","audience":{"@type":"EducationalAudience","educationalRole":"student"},"teaches":["How a drone goes up, down, left and right","What hover means","Why pilots watch the battery and take turns","Drone safety near people and walls","How quadcopters, helicopters and jets fly differently"],"gamePlatform":"Web browser","author":{"@type":"Person","name":"Edward Shih","sameAs":["https://www.linkedin.com/in/edward-shih-43942786","https://github.com/ultralabed"]}}
+{"@context": "https://schema.org", "@type": ["VideoGame", "LearningResource"], "name": "School Drone", "alternateName": "學校無人機", "url": "https://ultralabed.github.io/School-Drone/", "image": "https://ultralabed.github.io/School-Drone/og.png", "description": "A free browser game for kids. Fly a school drone in a library and let the robot teacher explain how drones go up, down, left, right and hover.", "inLanguage": ["en", "zh-Hant-TW"], "isAccessibleForFree": true, "license": "https://opensource.org/licenses/MIT", "genre": "Educational", "gamePlatform": "Web browser", "applicationCategory": "Game", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "audience": {"@type": "EducationalAudience", "educationalRole": "student"}, "teaches": ["How a drone goes up, down, left and right", "What hover means", "Why pilots watch the battery and take turns", "Drone safety near people and walls", "How quadcopters, helicopters and jets fly differently"], "author": {"@type": "Person", "name": "Edward Shih", "sameAs": ["https://www.linkedin.com/in/edward-shih-43942786", "https://github.com/ultralabed"]}, "publisher": {"@type": "Person", "name": "Edward Shih", "sameAs": ["https://www.linkedin.com/in/edward-shih-43942786", "https://github.com/ultralabed"]}, "contributor": {"@type": "Person", "name": "Aaron Shih", "description": "Original idea"}}
 </script>
-<title>School Drone Library</title>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "WebSite", "name": "School Drone", "alternateName": "學校無人機", "url": "https://ultralabed.github.io/School-Drone/", "inLanguage": ["en", "zh-Hant-TW"], "author": {"@type": "Person", "name": "Edward Shih", "sameAs": ["https://www.linkedin.com/in/edward-shih-43942786", "https://github.com/ultralabed"]}}
+</script>
+<title>School Drone: Free Drone Flying Game for Kids</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
 <style>
 /* Layout: one big library scene on top, the robot teacher's words under it, then three chunky control groups (fly, batteries, drone style). */
@@ -102,6 +118,8 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
 .voice{background:none;color:var(--muted);font-family:var(--body);font-weight:800;font-size:13px;text-decoration:underline;padding:6px 0;flex:none}
 .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .langb{background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-size:15px}
+.guides{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px;font-weight:800}
+.guides a{color:var(--blue)}
 .about{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px 28px}
 .about>div{min-width:0}
 .about p,.about ul{margin:0;font-weight:600;max-width:60ch}
@@ -156,6 +174,12 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
     </div>
   </div>
 
+  <nav class="guides" aria-label="Guides">
+    <a id="g-how" data-i="gHow" href="https://ultralabed.github.io/School-Drone/how-to-play.html" target="_blank" rel="noopener">How to play</a>
+    <a id="g-rules" data-i="gRules" href="https://ultralabed.github.io/School-Drone/rules.html" target="_blank" rel="noopener">Rules</a>
+    <a id="g-faq" data-i="gFaq" href="https://ultralabed.github.io/School-Drone/faq.html" target="_blank" rel="noopener">Questions</a>
+  </nav>
+
   <section class="card about" id="about">
     <div>
       <h2 data-i="learnH">What kids learn</h2>
@@ -163,7 +187,7 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
     </div>
     <div>
       <h2 data-i="whoH">Who made this</h2>
-      <p><span data-i="who1">School Drone is a kids' project made by</span> <a href="https://www.linkedin.com/in/edward-shih-43942786" target="_blank" rel="noopener author">Edward Shih</a><span data-i="who2">.</span></p>
+      <p><span data-i="who1">School Drone is a kids' project. The idea came from Aaron Shih. It was built by his dad,</span> <a href="https://www.linkedin.com/in/edward-shih-43942786" target="_blank" rel="noopener author">Edward Shih</a><span data-i="who2">.</span></p>
       <p><span data-i="who3">It is free and open source under the MIT license. You may copy it and change it. Please keep the author's name.</span> <a href="https://github.com/ultralabed/School-Drone" target="_blank" rel="noopener" data-i="code">See the code on GitHub</a></p>
     </div>
   </section>
@@ -179,7 +203,7 @@ const rand=(a,b)=>a+Math.random()*(b-a);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const F='"Baloo 2","PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';
 const L={
-en:{title:'School Drone Library',desc:'A free kids game. Fly a school drone in a library and let the robot teacher explain how drones fly.',
+en:{title:"School Drone: Free Drone Flying Game for Kids",desc:"A free browser game for kids. Fly a school drone in a library and let the robot teacher explain how drones go up, down, left, right and hover.",
  h1:'School <span>Drone</span>',pilot:'Pilot',height:'Height',other:'中文',
  aria:'A library. Kids stand around a rug watching a drone fly. Tap anywhere to send the drone there.',
  teacherLabel:'Robot drone teacher',hello:'Hello! I am the robot teacher inside the drone. Press Up to take off.',
@@ -209,10 +233,11 @@ en:{title:'School Drone Library',desc:'A free kids game. Fly a school drone in a
  tips:['Tip: tap anywhere in the library and I will fly there.','Tip: always keep the drone away from people and faces.','Tip: small button presses make smooth flying.','Tip: watch my shadow on the floor. It shows where I am.','Tip: a good pilot lands before the battery is empty.'],
  banner:'DRONE SCHOOL',sign1:'QUIET VOICES',sign2:'LOUD IDEAS',ask:'ASK ME',
  pilots:['Mia','Leo','Zara','Sam','Ava','Kai'],
- learnH:'What kids learn',whoH:'Who made this',who1:"School Drone is a kids' project made by",who2:'.',
+ gHow:'How to play',gRules:'Rules',gFaq:'Questions and answers',
+ learnH:'What kids learn',whoH:'Who made this',who1:"School Drone is a kids' project. The idea came from Aaron Shih. It was built by his dad,",who2:'.',
  who3:'It is free and open source under the MIT license. You may copy it and change it. Please keep the author\'s name.',code:'See the code on GitHub',
  learn:['Up and down: when the propellers spin faster they push more air down, and the drone goes up.','Left and right: the drone leans a little, and then it slides that way.','Hover: the drone can stay still in the air.','Batteries: a good pilot lands before the battery is empty. With 3 batteries, kids take turns.','Safety: keep the drone away from people, walls and bookshelves.','Flying machines: 4 propellers, 6 propellers, a helicopter and a jet all fly in different ways.','Nature: bees dance in a figure 8 to show friends where the flowers are.']},
-zh:{title:'學校無人機圖書館',desc:'免費的兒童小遊戲。在圖書館裡飛學校無人機,機器人老師會告訴你無人機是怎麼飛的。',
+zh:{title:"學校無人機:免費兒童無人機飛行網頁遊戲",desc:"免費的兒童網頁遊戲。在圖書館裡飛學校無人機,機器人老師會用簡單的話告訴你無人機怎麼上、下、左、右和懸停。",
  h1:'學校<span>無人機</span>',pilot:'小飛行員',height:'高度',other:'English',
  aria:'一間圖書館。小朋友圍著地毯看無人機飛。點任何地方,無人機就會飛過去。',
  teacherLabel:'機器人無人機老師',hello:'哈囉!我是住在無人機裡的機器人老師。按「上」就可以起飛。',
@@ -242,11 +267,13 @@ zh:{title:'學校無人機圖書館',desc:'免費的兒童小遊戲。在圖書�
  tips:['小提醒:點圖書館的任何地方,我就會飛過去。','小提醒:無人機要離人和臉遠遠的。','小提醒:輕輕按、慢慢按,飛起來才會順。','小提醒:看看地上的影子,就知道我在哪裡。','小提醒:好的飛行員會在電池沒電以前降落。'],
  banner:'無人機學校',sign1:'說話小小聲',sign2:'想法大大的',ask:'問我',
  pilots:['小美','小樂','小安','小山','小芸','小凱'],
- learnH:'小朋友可以學到什麼',whoH:'這是誰做的',who1:'學校無人機是一個給小朋友的作品,作者是',who2:'。',
+ gHow:'怎麼玩',gRules:'規則',gFaq:'常見問題',
+ learnH:'小朋友可以學到什麼',whoH:'這是誰做的',who1:'學校無人機是一個給小朋友的作品。點子來自 Aaron Shih,由他的爸爸',who2:' 製作。',
  who3:'這個作品免費、開放原始碼,使用 MIT 授權。你可以複製、可以修改,請保留作者的名字。',code:'到 GitHub 看程式碼',
  learn:['上和下:螺旋槳轉得越快,往下推的空氣越多,無人機就會往上飛。','左和右:無人機的身體斜一點點,就會往那一邊滑過去。','懸停:無人機可以停在空中不動。','電池:好的飛行員會在沒電以前降落。有 3 顆電池,大家可以輪流飛。','安全:無人機要離人、牆壁和書櫃遠一點。','飛行器:4 個螺旋槳、6 個螺旋槳、直升機和噴射機,飛的方法都不一樣。','大自然:蜜蜂會跳 8 字舞,告訴朋友花在哪裡。']}};
 let lang='en';
-try{const sv=localStorage.getItem('sd-lang');lang=sv==='zh'||sv==='en'?sv:(/^zh/i.test(navigator.language||'')?'zh':'en')}catch(e){lang=/^zh/i.test(navigator.language||'')?'zh':'en'}
+const QL=(()=>{try{const q=new URLSearchParams(location.search).get('lang');return q==='zh'||q==='en'?q:null}catch(e){return null}})();
+try{const sv=QL||localStorage.getItem('sd-lang');lang=sv==='zh'||sv==='en'?sv:(/^zh/i.test(navigator.language||'')?'zh':'en')}catch(e){lang=/^zh/i.test(navigator.language||'')?'zh':'en'}
 const t=(k,a)=>{const v=L[lang][k]??L.en[k];return typeof v==='function'?v(a):v};
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 
@@ -442,11 +469,60 @@ const bats=[100,100,100];let active=0,waiting=false,lowSaid=false;
 let PILOTS=L[lang].pilots;let pilot=0;
 let now=0,talkUntil=0,cheerUntil=0,lastCmd='',lastAct=0,voiceOn=true;
 const sayEl=$('say'),teacherEl=$('teacher');
-function say(text,speak){
-  sayEl.textContent=text;talkUntil=now+Math.min(7,1.2+text.length*.06);
-  if(speak!==false&&voiceOn){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=lang==='zh'?'zh-TW':'en-US';u.rate=.95;u.pitch=1.35;speechSynthesis.speak(u)}catch(e){}}
+/* speech: one-slot queue, voice picker, no cancel+speak in the same tick */
+let spBusy=false,spSince=0,spCur=null,spText='',spPend=null,spTimer=0,spVoice=null,spHave=0;
+const SP_GOOD=/natural|neural|premium|enhanced|online|google|siri/i,
+ SP_ZH=/mei-?jia|hsiaochen|hsiaoyu|國語|臺灣|台灣/i,SP_EN=/samantha|aria|jenny|ava|google us english/i,
+ SP_BAD=/espeak|compact|albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|zarvox|trinoids|whisper|jester|organ|superstar|fred|junior|ralph|kathy/i;
+function voiceScore(v){
+  const l=String(v.lang||'').replace('_','-').toLowerCase(),n=String(v.name||''),zh=lang==='zh';let s;
+  if(zh){if(l.indexOf('zh')!==0&&l.indexOf('yue')!==0)return -1e9;
+    s=l==='zh-tw'?100:l.indexOf('zh-hant')===0?80:(l==='zh-hk'||l.indexOf('yue')===0||/cantonese|粵|廣東/i.test(n))?10:50}
+  else{if(l.indexOf('en')!==0)return -1e9;s=l==='en-us'?100:l==='en-gb'?80:50}
+  if(SP_GOOD.test(n))s+=60;if((zh?SP_ZH:SP_EN).test(n))s+=50;
+  if(/espeak/i.test(n))s-=300;if(SP_BAD.test(n))s-=200;return s}
+function pickVoice(){
+  spVoice=null;spHave=0;
+  try{const vs=speechSynthesis.getVoices()||[];spHave=vs.length;let best=-1e8;
+    vs.forEach(v=>{const s=voiceScore(v);if(s>best&&s>-1e8){best=s;spVoice=v}})}catch(e){}
 }
-$('voice').addEventListener('click',()=>{voiceOn=!voiceOn;$('voice').textContent=t(voiceOn?'voiceOn':'voiceOff');if(!voiceOn){try{speechSynthesis.cancel()}catch(e){}}});
+try{speechSynthesis.addEventListener('voiceschanged',pickVoice)}catch(e){}
+function spStop(){
+  clearTimeout(spTimer);spPend=null;spBusy=false;spCur=null;spText='';
+  try{speechSynthesis.cancel()}catch(e){}
+}
+function spNext(){
+  const p=spPend;spPend=null;
+  if(p&&Date.now()-p.t<4000)spStart(p.text);
+}
+function spStart(text){
+  spBusy=true;spSince=Date.now();spText=text;
+  try{
+    if(lang==='zh')text=text.replace(/[「」]/g,'').replace(/(\d) (?=[㐀-鿿])/g,'$1');
+    if(!spVoice&&spHave)pickVoice();
+    if(spHave&&!spVoice){spBusy=false;spText='';return}
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=lang==='zh'?'zh-TW':'en-US';u.rate=lang==='zh'?.95:1;u.pitch=lang==='zh'?1:1.05;u.volume=1;
+    if(spVoice)u.voice=spVoice;
+    const done=()=>{if(u!==spCur)return;spBusy=false;spCur=null;spText='';spNext()};
+    u.onstart=()=>{if(u===spCur)spSince=Date.now()};u.onend=done;u.onerror=done;
+    spCur=u;speechSynthesis.speak(u);
+  }catch(e){spBusy=false;spCur=null;spText=''}
+}
+function say(text,speak,urgent){
+  sayEl.textContent=text;talkUntil=now+Math.min(7,1.2+text.length*.06);
+  if(speak===false||!voiceOn)return;
+  try{
+    if(spBusy&&Date.now()-spSince>12000){spBusy=false;spCur=null;spText=''}
+    if(urgent){
+      clearTimeout(spTimer);spPend=null;spCur=null;spBusy=true;spSince=Date.now();spText=text;
+      try{speechSynthesis.cancel()}catch(e){}
+      spTimer=setTimeout(()=>{if(voiceOn)spStart(text);else spBusy=false},80);return}
+    if(text===spText||(spPend&&spPend.text===text))return;
+    if(!spBusy)spStart(text);else spPend={text:text,t:Date.now()};
+  }catch(e){}
+}
+$('voice').addEventListener('click',()=>{voiceOn=!voiceOn;$('voice').textContent=t(voiceOn?'voiceOn':'voiceOff');if(!voiceOn)spStop()});
 
 function blocked(){
   if(waiting){say(t('wait'));return true}
@@ -476,7 +552,7 @@ function cmd(c){
 function trySwap(quiet){
   let best=-1;for(let i=0;i<3;i++)if(i!==active&&(best<0||bats[i]>bats[best]))best=i;
   if(bats[best]>=25){active=best;pilot=(pilot+1)%PILOTS.length;D.forced=false;waiting=false;lowSaid=false;
-    $('pilot').textContent=PILOTS[pilot];say(t('fresh',PILOTS[pilot]))}
+    $('pilot').textContent=PILOTS[pilot];say(t('fresh',PILOTS[pilot]),true,true)}
   else if(!quiet){waiting=true;say(t('wait'))}
 }
 const TIPS=['Tip: tap anywhere in the library and I will fly there.','Tip: always keep the drone away from people and faces.','Tip: small button presses make smooth flying.','Tip: watch my shadow on the floor. It shows where I am.','Tip: a good pilot lands before the battery is empty.'];
@@ -495,8 +571,8 @@ function update(dt){
     if(D.mode==='land'&&D.alt<1.5&&Math.abs(D.x-400)<3){D.alt=0;D.x=400;D.vx=0;D.mode='landed';lastCmd='';
       if(D.forced)trySwap();}
     bats[active]-=dt*100/35;
-    if(bats[active]<=22&&!lowSaid&&bats[active]>0){lowSaid=true;say(t('batLow'))}
-    if(bats[active]<=0&&!D.forced){bats[active]=0;D.forced=true;D.mode='land';D.tx=400;D.ta=0;say(t('batEmpty'))}
+    if(bats[active]<=22&&!lowSaid&&bats[active]>0){lowSaid=true;say(t('batLow'),true,true)}
+    if(bats[active]<=0&&!D.forced){bats[active]=0;D.forced=true;D.mode='land';D.tx=400;D.ta=0;say(t('batEmpty'),true,true)}
   }else D.vx=0;
   if(waiting)trySwap(true);
   for(let i=0;i<3;i++)if(i!==active)bats[i]=Math.min(100,bats[i]+dt*100/50);
@@ -580,9 +656,10 @@ function applyLang(first){
   document.querySelectorAll('[data-i]').forEach(e=>{e.textContent=t(e.dataset.i)});
   $('lang').textContent=t('other');$('lang').lang=lang==='zh'?'en':'zh-Hant';
   $('voice').textContent=t(voiceOn?'voiceOn':'voiceOff');
+  for(const g of['how-to-play','rules','faq'])$({'how-to-play':'g-how',rules:'g-rules',faq:'g-faq'}[g]).href='https://ultralabed.github.io/School-Drone/'+(lang==='zh'?'zh/':'')+g+'.html';
   $('learn').innerHTML='';for(const x of t('learn')){const li=document.createElement('li');li.textContent=x;$('learn').appendChild(li)}
   for(const k in styleBtns)styleBtns[k]._l.nodeValue=t('s_'+k);
-  if(first)sayEl.textContent=t('hello');else{buildBg();say(t('langSay'))}
+  if(first){sayEl.textContent=t('hello');pickVoice()}else{buildBg();spStop();pickVoice();say(t('langSay'),true,true)}
 }
 $('lang').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';try{localStorage.setItem('sd-lang',lang)}catch(e){}applyLang(false)});
 applyLang(true);

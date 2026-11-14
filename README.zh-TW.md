@@ -32,6 +32,6 @@
 
 ## 授權與作者
 
-作者:[Edward Shih](https://www.linkedin.com/in/edward-shih-43942786)
+點子來自 Aaron Shih,由他的爸爸 [Edward Shih](https://www.linkedin.com/in/edward-shih-43942786) 製作。
 
 MIT 授權。你可以使用、複製和修改這個作品,請保留 [LICENSE](LICENSE) 裡的版權那一行,讓大家找得到作者。

@@ -4,8 +4,18 @@
 
 - Play: https://ultralabed.github.io/School-Drone/
 - Source code: https://github.com/ultralabed/School-Drone
-- Author: Edward Shih (https://www.linkedin.com/in/edward-shih-43942786)
+- Idea: Aaron Shih
+- Built by: Edward Shih (https://www.linkedin.com/in/edward-shih-43942786)
 - License: MIT
+
+## Guides
+
+- [How to play (English)](https://ultralabed.github.io/School-Drone/how-to-play.html)
+- [Rules (English)](https://ultralabed.github.io/School-Drone/rules.html)
+- [Questions and answers (English)](https://ultralabed.github.io/School-Drone/faq.html)
+- [怎麼玩 (Traditional Chinese)](https://ultralabed.github.io/School-Drone/zh/how-to-play.html)
+- [規則 (Traditional Chinese)](https://ultralabed.github.io/School-Drone/zh/rules.html)
+- [常見問題 (Traditional Chinese)](https://ultralabed.github.io/School-Drone/zh/faq.html)
 
 ## What kids learn
 
